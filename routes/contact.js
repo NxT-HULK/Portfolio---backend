@@ -4,8 +4,10 @@ const ContactSchema = require('../models/contact');
 const errorMiddleware = require('../middleware/error');
 const nodemailer = require('nodemailer')
 const { body, validationResult } = require('express-validator');
+const verifyAdmin = require('../middleware/verifyAdmin');
 
-// Get all testimonial data || Login Require 
+
+// Get all Contact data || Login Require 
 // TODO - Insert Middleware for admin authentication
 router.get('/', verifyAdmin, async (req, res, next) => {
     try {
@@ -22,7 +24,7 @@ router.get('/', verifyAdmin, async (req, res, next) => {
 // POST testiminal data and alsop send email
 router.post('/', [
     body('name').exists().withMessage("Name is required!").isLength({ min: 3 }),
-    body('mess').exists().withMessage("Did you forgot to fill in the contact input field?").custom((value) => {
+    body('mess').exists().withMessage("Did you forgot to fill your message ?").custom((value) => {
         const endRange = 500
         if (value.length < 5 || value.length > endRange) {
             throw new Error(`Your message should be in range of 5 to ${endRange} letters!`)
@@ -66,15 +68,17 @@ router.post('/', [
             }).sendMail({
                 from: process.env.MAILINGADDRESS,
                 to: email,
-                subject: "Thank You for Sharing Your Testimonial! 😊",
+                subject: "Thank You for Reaching Out!",
                 html: `
                         <p> Dear ${name}, </p>
                         <p>
-                            I hope this message finds you well. I wanted to personally express my gratitude for reaching out to me. Your message
-                            is highly appreciated, and I am thrilled to connect with you. <br />
-                            I have received your inquiry and will get back to you as soon as possible. In the meantime, if you have any urgent
-                            matters, feel free to contact me directly at <a href="mailto:${process.env.OWNERMAIL}">mail</a> or <a href="tel:${process.env.OWNERPHONE}">phone</a>. <br />
-                            Thank you once again for reaching out. I am looking forward to the opportunity to assist you. <br />
+                            I hope this message finds you well. I wanted to personally express my gratitude for reaching out to me. Your message is highly appreciated, and I am thrilled to connect with you.
+                        </p>
+                        <p>
+                            I have received your inquiry and will get back to you as soon as possible. In the meantime, if you have any urgent matters, feel free to contact me directly at <a href="mailto:${process.env.OWNERMAIL}">${process.env.OWNERMAIL}</a> or <a href="tel:${process.env.OWNERPHONE}">${process.env.OWNERPHONE}</a>.
+                        </p>
+                        <p>
+                            Thank you once again for reaching out. I am looking forward to the opportunity to assist you.
                         </p>
                         
                         <p>
@@ -83,7 +87,7 @@ router.post('/', [
                             MERN Stack Developer <br>
                         </p>
 
-                        <p><small style="color: #ccc;"> *This is system genrated with the server of Shivam Kashyap* </small></p>
+                        <p><small style="color: #ccc;"> *This is system genrated mail with the server of Shivam Kashyap* </small></p>
                     `
             }).then(async () => {
                 // Verification of data via admin

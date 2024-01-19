@@ -57,6 +57,8 @@ router.post('/', [
         })
         data.save()
 
+        let testimonial_id = data._id;
+
         if (email) {
             // Thanks and greet to recipitent
             await nodemailer.createTransport({
@@ -94,11 +96,11 @@ router.post('/', [
                                 <span> Best regards,</span> <br>
                                 <span>Shivam Kashyap</span> <br>
                                 <span>MERN Stack Developer</span> <br>
-                                <span><a href="mailto:${process.env.OWNERMAIL}">Mail</a></span> <br>
-                                <span><a href="tel:${process.env.OWNERPHONE}">Contact</a></span> <br>
+                                <span><a href="mailto:${process.env.OWNERMAIL}">${process.env.OWNERMAIL}</a></span> <br>
+                                <span><a href="tel:${process.env.OWNERPHONE}">${process.env.OWNERPHONE}</a></span> <br>
                             <p>
 
-                            <p><small style="color: #ccc;"> *This is system genrated with the server of Shivam Kashyap* </small></p>
+                            <p><small style="color: #ccc;"> *This is system genrated mail with the server of Shivam Kashyap* </small></p>
                     `
             }).then(async () => {
                 // Verification of data via admin
@@ -119,10 +121,13 @@ router.post('/', [
                         Mess: <br /><br />
                         ${mess}
                         <br/><br/>
+                        
                         <big>
-                            <a href="https://shivamkashyap.netlify.app/#/admin">
-                                Admin Login
-                            </a>
+                            <strong>
+                                <a href="${process.env.BACKENDHOST}/testimonial/update-status/${testimonial_id}">
+                                    Verify Testimonial Now!
+                                </a>
+                            </strong>
                         </big>
                     `
                 })
@@ -138,8 +143,7 @@ router.post('/', [
 
 
 // Verify via Admin || Login Require
-// TODO - Insert Middleware for admin authentication
-router.put('/update-status/:_id', verifyAdmin, async (req, res, next) => {
+router.get('/update-status/:_id', async (req, res, next) => {
     try {
 
         const id = req.params._id
@@ -152,7 +156,7 @@ router.put('/update-status/:_id', verifyAdmin, async (req, res, next) => {
 })
 
 
-// Delete via Admin || Login require
+// Delete via Admin || Login require || Current not in use
 // TODO - Insert Middleware for admin authentication
 router.delete('/:_id', verifyAdmin, async (req, res, next) => {
     try {
