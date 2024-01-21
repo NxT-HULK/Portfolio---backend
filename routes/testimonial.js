@@ -157,8 +157,7 @@ router.get('/update-status/:_id', async (req, res, next) => {
 
 
 // Delete via Admin || Login require || Current not in use
-// TODO - Insert Middleware for admin authentication
-router.delete('/:_id', verifyAdmin, async (req, res, next) => {
+router.delete('/:_id', async (req, res, next) => {
     try {
 
         const id = req.params._id
@@ -170,5 +169,15 @@ router.delete('/:_id', verifyAdmin, async (req, res, next) => {
     }
 })
 
+
+// get all testimonial data
+router.get('/get-all', async (req, res, next) => { 
+    try {
+        let data = await TestimonialSchema.find({})
+        return res.status(200).json(data)
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
 
 module.exports = router;

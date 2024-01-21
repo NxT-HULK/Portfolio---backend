@@ -19,6 +19,9 @@ app.use('/testimonial', require('./routes/testimonial'))
 // Contact routes goes here
 app.use('/contact', require('./routes/contact'))
 
+// Admin login
+app.use('/admin', require('./routes/admin'))
+
 // App listen
 app.listen(port, () => {
     console.log(`Server is listening at PORT -  ${port}`);

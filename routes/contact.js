@@ -4,12 +4,10 @@ const ContactSchema = require('../models/contact');
 const errorMiddleware = require('../middleware/error');
 const nodemailer = require('nodemailer')
 const { body, validationResult } = require('express-validator');
-const verifyAdmin = require('../middleware/verifyAdmin');
 
 
 // Get all Contact data || Login Require 
-// TODO - Insert Middleware for admin authentication
-router.get('/', verifyAdmin, async (req, res, next) => {
+router.get('/', async (req, res, next) => {
     try {
 
         let data = await ContactSchema.find({});
@@ -121,13 +119,12 @@ router.post('/', [
 
 
 // Delete via Admin || Login require
-// TODO - Insert Middleware for admin authentication
-router.delete('/:_id', verifyAdmin, async (req, res, next) => {
+router.delete('/:_id', async (req, res, next) => {
     try {
 
         const id = req.params._id
         await ContactSchema.findByIdAndDelete({ _id: id })
-        return res.status(200).json("Data has been deleted")
+        return res.status(200).json(id)
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
