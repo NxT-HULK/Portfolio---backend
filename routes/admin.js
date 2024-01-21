@@ -34,10 +34,6 @@ router.post('/login', [
 
     try {
         const LoginKey = getPassword()
-        
-        console.log(`Loginkey - ${LoginKey}`);
-        console.log(`loginID - ${process.env.ADMIN_ID}`);
-        console.log(`Body ->  id-${req.body.id} key-${req.body.key}`)
 
         if (process.env.ADMIN_ID === req.body.id && LoginKey === req.body.key) {
             let data = {
