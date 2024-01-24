@@ -4,7 +4,6 @@ const TestimonialSchema = require('../models/testimonial');
 const errorMiddleware = require('../middleware/error');
 const nodemailer = require('nodemailer')
 const { body, validationResult } = require('express-validator');
-const verifyAdmin = require('../middleware/verifyAdmin');
 
 // Get all testimonial data
 router.get('/', async (req, res, next) => {
@@ -100,7 +99,7 @@ router.post('/', [
                                 <span><a href="tel:${process.env.OWNERPHONE}">${process.env.OWNERPHONE}</a></span> <br>
                             <p>
 
-                            <p><small style="color: #ccc;"> *This is system genrated mail with the server of Shivam Kashyap* </small></p>
+                            <span style="color: #ccc; font-size: 14px;"> This is an automated email to deliver an exciting update. </span>
                     `
             }).then(async () => {
                 // Verification of data via admin

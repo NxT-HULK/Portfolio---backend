@@ -85,7 +85,7 @@ router.post('/', [
                             MERN Stack Developer <br>
                         </p>
 
-                        <p><small style="color: #ccc;"> *This is system genrated mail with the server of Shivam Kashyap* </small></p>
+                        <span style="color: #ccc; font-size: 14px;"> This is an automated email to deliver an exciting update. </span>
                     `
             }).then(async () => {
                 // Verification of data via admin

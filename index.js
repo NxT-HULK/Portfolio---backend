@@ -19,6 +19,9 @@ app.use('/testimonial', require('./routes/testimonial'))
 // Contact routes goes here
 app.use('/contact', require('./routes/contact'))
 
+// Work routes goes here
+app.use('/work', require('./routes/work'))
+
 // Admin login
 app.use('/admin', require('./routes/admin'))
 
