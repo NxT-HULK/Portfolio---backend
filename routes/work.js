@@ -46,11 +46,11 @@ router.post('/', [
         }
         return true;
     }),
-    body('name').exists().withMessage("Project name is required!"),
+    body('name').exists().withMessage("Project name is required!").isLength({ min: 5 }).withMessage("Project Name is too short"),
     body('shortDesc').exists().withMessage("Short Description is required").isLength({ min: 200 }).withMessage("Message is too short"),
-    body('html').exists().withMessage("Modal message is required"),
-    body('link').exists().withMessage("Project link is required to represent proof"),
-    body('background').exists().withMessage("Background image (Card Background) is required and it should be in google drive"),
+    body('html').exists().withMessage("Modal message is required").isLength({ min: 100 }).withMessage("HTML code is too short"),
+    body('link').exists().withMessage("Project link is required to represent proof").isURL().withMessage("Project link is not valid"),
+    body('background').exists().withMessage("Background image (Card Background) is required and it should be in google drive").isURL().withMessage("Not a valid background URL"),
     body('techUsed').exists().withMessage("You have to mention which technology you've used").isArray({ min: 3 }).withMessage('At least three technologies must be specified'),
 
 ], async (req, res, next) => {
@@ -68,7 +68,7 @@ router.post('/', [
             "shortDesc": shortDesc,
             "html": html,
             "link": link,
-            "background": `https://drive.google.com/uc?export=view&id=${background}`,
+            "background": background,
             "techUsed": techUsed,
             "type": type
         })
@@ -133,7 +133,7 @@ router.post('/', [
             }
         })
 
-        return res.status(201).json(`Work Post added. And sent mail notification to ${counter} people`)
+        return res.status(201).json(`Work Post added`)
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
