@@ -53,7 +53,7 @@ router.post('/', [
             "mess": mess,
             "email": email ? email : '',
         })
-        data.save()
+        await data.save()
 
         if (email) {
             // Thanks and greet to recipitent

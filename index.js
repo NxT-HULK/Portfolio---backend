@@ -22,6 +22,9 @@ app.use('/contact', require('./routes/contact'))
 // Work routes goes here
 app.use('/work', require('./routes/work'))
 
+// Newsletter routes goes here
+app.use('/news', require('./routes/news_letter'))
+
 // Admin login
 app.use('/admin', require('./routes/admin'))
 
