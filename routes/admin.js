@@ -25,7 +25,7 @@ router.post('/login', [
     body('id').exists().withMessage("Admin ID is required!").isEmail().withMessage("Did you forgot you ID!"),
     body('key').exists().withMessage("Password is required").isLength({ min: 6 }).withMessage("Password is too short!")
 
-], (req, res) => {
+], (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -46,7 +46,7 @@ router.post('/login', [
             return res.status(400).json('Invalid Credential')
         }
     } catch (error) {
-        return res.status(500).json(error.message)
+        errorMiddleware(error, req, res, next);
     }
 })
 
@@ -60,7 +60,7 @@ router.post('/verify', async (req, res, next) => {
 
         if (LoginID === process.env.ADMIN_ID && LoginKey === passkey) {
             return res.status(200).json("Admin Verified")
-        } else { 
+        } else {
             return res.status(200).json("Invalid Token")
         }
     } catch (error) {

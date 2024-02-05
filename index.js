@@ -25,6 +25,9 @@ app.use('/work', require('./routes/work'))
 // Newsletter routes goes here
 app.use('/news', require('./routes/news_letter'))
 
+// Custom Mailing - Login Require
+app.use('/mail', require('./routes/custom_mailing'))
+
 // Admin login
 app.use('/admin', require('./routes/admin'))
 

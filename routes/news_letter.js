@@ -112,11 +112,16 @@ router.get('/:email', async (req, res, next) => {
 
 
 // Unsubscribe news -> Directly via user
-router.post('/unsubscribe/:id', async (req, res, next) => {
+router.post('/unsubscribe/:email', async (req, res, next) => {
     try {
 
-        await NewsSchema.findOneAndUpdate({ email: req.params.email }, { $set: { status: false } })
-        return res.status(200).json("unsubscribe done")
+        let data = await NewsSchema.findOneAndUpdate({ email: req.params.email }, { $set: { status: false } })
+
+        if (data._id) {
+            return res.status(200).json("unsubscribe done")
+        } else { 
+            return res.status(200).json("No Data Found")
+        }
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
