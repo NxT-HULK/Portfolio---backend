@@ -190,20 +190,38 @@ router.put('/modules/add_page', [
 ], BodyValidator, async (req, res, next) => {
 
     try {
-        let { module_id, page_name, page_number, html } = req.body
-        let page = new CoursePageSchema({
-            name: page_name,
-            page_number: page_number,
-            html: html
-        })
+        let { module_id, page_name, page_number, html, updateFlag, pageId } = req.body
+        if (!updateFlag) {
+            let page = new CoursePageSchema({
+                name: page_name,
+                page_number: page_number,
+                html: html
+            })
 
-        await page.save()
-        let update = await CourseModuleSchema.findOneAndUpdate({ _id: module_id }, { $push: { pages: page } })
+            await page.save()
+            let update = await CourseModuleSchema.findOneAndUpdate({ _id: module_id }, { $push: { pages: page._id } })
 
-        return res.status(201).json({
-            message: `Page: "${page_name}" is now inserted at "${update.module_name}"`,
-            data: page
-        })
+            return res.status(201).json({
+                message: `Page: "${page_name}" is now inserted at "${update.module_name}"`,
+                data: page
+            })
+        } else {
+
+            let page = await CoursePageSchema.findOneAndUpdate({ _id: pageId }, {
+                $set: {
+                    name: page_name,
+                    page_number: page_number,
+                    html: html
+                }
+            })
+
+            let update = await CoursePageSchema.findById({ _id: page._id })
+
+            return res.status(200).json({
+                message: 'Page has been updated',
+                data: update
+            })
+        }
 
     } catch (error) {
         errorMiddleware(error, req, res, next)
