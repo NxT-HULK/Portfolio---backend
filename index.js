@@ -31,6 +31,9 @@ app.use('/mail', require('./routes/custom_mailing'))
 // Admin login
 app.use('/admin', require('./routes/admin'))
 
+// Course Endpoint
+app.use('/course', require('./routes/course'))
+
 // App listen
 app.listen(port, () => {
     console.log(`Server is listening at PORT -  ${port}`);
