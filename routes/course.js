@@ -87,6 +87,11 @@ router.post('/', [
                 { $set: { name, img, usedTech, information, welcome_screen } },
                 { new: true, upsert: true }
             )
+
+            return res.status(200).json({
+                message: `Course: "${name}" is now updated`,
+                data: course
+            })
         } else {
             course = new Course({
                 name: name,
@@ -97,15 +102,11 @@ router.post('/', [
             })
 
             await course.save()
-        }
 
-        if (course._id) {
-            return res.status(200).json({
-                message: `Course: "${name}" is now created/updated`,
+            return res.status(201).json({
+                message: `Course: "${name}" is now created`,
                 data: course
             })
-        } else {
-            return res.status(400).json(`Somthing get wrong on creating course`)
         }
 
     } catch (error) {
