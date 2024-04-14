@@ -34,6 +34,9 @@ app.use('/admin', require('./routes/admin'))
 // Course Endpoint
 app.use('/course', require('./routes/course'))
 
+// Site Notification
+app.use('/notify', require('./routes/notification'))
+
 // App listen
 app.listen(port, () => {
     console.log(`Server is listening at PORT -  ${port}`);
