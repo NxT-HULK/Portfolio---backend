@@ -6,6 +6,10 @@ const CourseModule = new Schema({
         type: String,
         require: true
     },
+    of_course: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: true
+    },
     module_number: {
         type: Number,
         require: true

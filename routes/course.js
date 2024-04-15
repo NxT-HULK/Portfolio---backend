@@ -149,7 +149,8 @@ router.put('/add_module', [
             let newModule = new CourseModuleSchema({
                 course_id: course_id,
                 module_name: module_name,
-                module_number: module_number
+                module_number: module_number,
+                of_course: course_id
             })
 
             await newModule.save()
@@ -195,6 +196,7 @@ router.put('/modules/add_page', [
         if (!updateFlag) {
             let page = new CoursePageSchema({
                 name: page_name,
+                of_module: module_id,
                 page_number: page_number,
                 html: html
             })

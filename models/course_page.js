@@ -7,6 +7,10 @@ const CoursePageSchema = new Schema({
         type: String,
         require: true
     },
+    of_module: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: true
+    },
     page_number: {
         type: Number,
         require: true
