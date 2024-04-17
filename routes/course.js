@@ -361,11 +361,16 @@ router.get('/learning-matarial/:course_id', async (req, res) => {
     try {
 
         let _id = req.params.course_id;
+        let course = null
+        if (req.headers.admin === "true") {
+            course = await Course.findOne({ _id });
+        } else {
+            course = await Course.findOne({ _id, status: true });
+        }
 
-        let course = await Course.findOne({ _id, status: true });
         let modules = course?.modules;
 
-        if (!course) { 
+        if (!course) {
             return res.status(400).json({ modules: [], pages: [] });
         }
 

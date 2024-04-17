@@ -1,27 +1,25 @@
 const express = require('express')
 const router = express.Router();
-const fs = require('fs')
 const { body } = require('express-validator');
 const errorMiddleware = require('../middleware/error')
 const BodyValidator = require('../middleware/body_validator')
+const NotificationSchema = require('../models/notification')
 
 
 // GET notification data
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
     try {
 
-        const filePath = __dirname.toString().split("routes")[0].concat("JSON/notification.json")
-        const data = fs.readFileSync(filePath, 'utf-8');
-        const jsonData = JSON.parse(data);
-        if (jsonData) {
-            if (jsonData?.mess?.length > 0) {
-                return res.status(200).json(jsonData)
-            } else {
-                return res.status(404).json('Not Found')
-            }
-        } else {
-            return res.status(404).json('Not Found')
+        let raw = await NotificationSchema.find({})
+        if (!raw || raw?.length === 0) {
+            return res.status(404).json(null);
         }
+
+        raw.sort((a, b) => {
+            return b.createdAt - a.createdAt
+        })
+
+        return res.status(200).json(raw[0]);
 
     } catch (error) {
         errorMiddleware(error, req, res, next)
@@ -35,16 +33,13 @@ router.post('/', [
 ], BodyValidator, async (req, res, next) => {
     try {
 
-        const filePath = __dirname.toString().split("routes")[0].concat("JSON/notification.json")
-        fs.writeFileSync(filePath, JSON.stringify({
-            "mess": req.body.mess,
-            "date": Date.now()
-        }));
+        let raw = await new NotificationSchema({
+            mess: req.body.mess,
+            date: Date.now()
+        }).save()
 
-        let response = fs.readFileSync(filePath, 'utf-8');
-        const jsonData = JSON.parse(response);
-        if (jsonData) {
-            return res.status(201).json(jsonData)
+        if (raw._id) {
+            return res.status(201).json(raw)
         } else {
             return res.status(400).json('Somthing went wrong')
         }
@@ -55,24 +50,12 @@ router.post('/', [
 })
 
 
-// DELETE notification -> Illusion for deleting file
-router.delete('/', (req, res, next) => {
+// DELETE notification
+router.delete('/', async (req, res, next) => {
     try {
 
-        const filePath = __dirname.toString().split("routes")[0].concat("JSON/notification.json")
-        fs.writeFileSync(filePath, JSON.stringify({
-            "mess": '',
-            "date": Date.now()
-        }));
-
-        const data = fs.readFileSync(filePath, 'utf-8')
-        const jsonData = JSON.parse(data)
-
-        if (jsonData?.mess?.length === 0) {
-            return res.status(200).json('Delete Success');
-        } else {
-            return res.status(400).json('Bad Request');
-        }
+        await NotificationSchema.remove({})
+        return res.status(200).json('Delete Success');
 
     } catch (error) {
         errorMiddleware(error, req, res, next)
