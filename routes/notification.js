@@ -48,7 +48,7 @@ router.post('/', [
             }
         }
 
-        return res.status(400).json(req.body.mess)
+        return res.status(201).json(req.body.mess)
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
