@@ -36,7 +36,10 @@ router.post('/', [
         let oldData = await NotificationSchema.find({})
 
         if (oldData) {
-            await NotificationSchema.findByIdAndUpdate({ _id: oldData[0]._id }, { $set: { mess: req.body.mess } })
+            
+            let raw = await NotificationSchema.findByIdAndUpdate({ _id: oldData[0]._id }, { $set: { mess: req.body.mess } })
+            return res.status(201).json(raw)
+            
         } else {
             let raw = await new NotificationSchema({
                 mess: req.body.mess,
@@ -47,8 +50,6 @@ router.post('/', [
                 return res.status(201).json(raw)
             }
         }
-
-        return res.status(201).json(req.body.mess)
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
