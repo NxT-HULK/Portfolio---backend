@@ -33,16 +33,22 @@ router.post('/', [
 ], BodyValidator, async (req, res, next) => {
     try {
 
-        let raw = await new NotificationSchema({
-            mess: req.body.mess,
-            date: Date.now()
-        }).save()
+        let oldData = await NotificationSchema.find({})
 
-        if (raw._id) {
-            return res.status(201).json(raw)
+        if (oldData) {
+            await NotificationSchema.findByIdAndUpdate({ _id: oldData[0]._id }, { $set: { mess: req.body.mess } })
         } else {
-            return res.status(400).json('Somthing went wrong')
+            let raw = await new NotificationSchema({
+                mess: req.body.mess,
+                date: Date.now()
+            }).save()
+
+            if (raw._id) {
+                return res.status(201).json(raw)
+            }
         }
+
+        return res.status(400).json(req.body.mess)
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
