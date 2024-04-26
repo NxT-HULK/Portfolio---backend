@@ -6,6 +6,7 @@ const Course = require('../models/course');
 const CourseModuleSchema = require('../models/course_module')
 const CoursePageSchema = require('../models/course_page')
 const BodyValidator = require('../middleware/body_validator');
+const { default: mongoose } = require('mongoose');
 
 
 // default get method
@@ -61,6 +62,30 @@ router.get('/admin/', async (req, res, next) => {
     }
 });
 
+
+// Get details from entire course --> createdDate and lastUpdatedAt
+router.post('/last-updated', [
+    body('course_id').exists().withMessage('Course ID not found').isMongoId().withMessage("Course ID not valid!")
+], BodyValidator, async (req, res, next) => {
+    try {
+        let course = await Course.findById({ _id: req.body.course_id });
+        if (!course) {
+            return res.status(401).json('Unauthorize!')
+        }
+
+        let pages = await CoursePageSchema.find({ of_module: { $in: course.modules } }).select('-html')
+
+        let createdAt = pages.toSorted((a, b) => a.updatedAt - b.updatedAt)[0]?.updatedAt
+        let lastUpdated = pages.toSorted((a, b) => b.updatedAt - a.updatedAt)[0]?.updatedAt
+
+        return res.status(200).json({
+            'start': createdAt,
+            'last': lastUpdated
+        })
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
 
 // create new course || update old course data (basic Data)
 router.post('/', [
