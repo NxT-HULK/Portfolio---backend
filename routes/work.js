@@ -6,6 +6,7 @@ const errorMiddleware = require('../middleware/error');
 const nodemailer = require('nodemailer')
 const { body, validationResult } = require('express-validator');
 const WorkSchema = require('../models/work')
+const BodyValidator = require('../middleware/body_validator')
 
 
 // Get all work data
@@ -53,13 +54,8 @@ router.post('/', [
     body('background').exists().withMessage("Background image (Card Background) is required and it should be in google drive").isURL().withMessage("Not a valid background URL"),
     body('techUsed').exists().withMessage("You have to mention which technology you've used").isArray({ min: 3 }).withMessage('At least three technologies must be specified'),
 
-], async (req, res, next) => {
+], BodyValidator, async (req, res, next) => {
     try {
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array()[0].msg);
-        }
 
         let { name, shortDesc, html, link, background, techUsed, type } = req.body
 
@@ -150,6 +146,42 @@ router.delete('/:_id', async (req, res, next) => {
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
+    }
+})
+
+
+// setting up order of project
+router.post('/change-order', [
+
+    body('order').exists().withMessage("Work order not found").custom((val) => {
+        if (val > 0) {
+            return true;
+        }
+
+        throw new Error("Negative and zero value not allowed!")
+    }),
+    body('_id').exists().withMessage("Project ID not found").isMongoId().withMessage("Unauthorize access not allowed")
+
+], BodyValidator, async (req, res, next) => {
+    try {
+
+        let { order, _id } = req.body
+
+        await WorkSchema.findByIdAndUpdate(
+            { _id: _id },
+            { $set: { order: order } }
+        )
+
+        let data = await WorkSchema.findOne({ _id: _id })
+
+        if (data.order === order * 1) {
+            return res.status(200).json(data)
+        } else {
+            return res.status(400).json("Bad Request")
+        }
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
     }
 })
 

@@ -29,6 +29,11 @@ const WorkSchema = new Schema({
     type: {
         type: String,
         require: true
+    },
+    order: {
+        type: Number,
+        require: true,
+        default: 9999
     }
 }, { timestamps: true });
 
