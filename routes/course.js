@@ -6,7 +6,6 @@ const Course = require('../models/course');
 const CourseModuleSchema = require('../models/course_module')
 const CoursePageSchema = require('../models/course_page')
 const BodyValidator = require('../middleware/body_validator');
-const { default: mongoose } = require('mongoose');
 
 
 // default get method
