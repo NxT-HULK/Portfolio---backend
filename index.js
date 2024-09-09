@@ -57,9 +57,9 @@ app.use(ConnectToDB);
 // Routes
 app.use('/', DefaultRoute);
 app.use('/api/client/', ClientRoute);
-// app.use('/api/admin/', AdminRoute);
+app.use('/api/admin/', AdminRoute);
 
 
 app.listen(PORT, () => {
-    console.log(`Server is running on PORT: ${port}`);
+    console.log(`Server is running on PORT: ${PORT}`);
 });
