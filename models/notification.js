@@ -1,20 +1,17 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose;
+import mongoose, { Schema } from "mongoose"
 
 const NotificationSchema = new Schema({
-
     mess: {
         type: String,
-        require: true
+        required: true
     },
     date: {
         type: Date,
-        require: true,
+        required: true,
     }
-
 }, { timestamps: true });
 
-const notify = mongoose.model('notify', NotificationSchema);
-notify.createIndexes();
+const notify = mongoose.model('notify', NotificationSchema)
+notify.createIndexes()
 
-module.exports = notify;
+export default notify

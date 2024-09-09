@@ -1,28 +1,25 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose;
+import mongoose, { Schema } from 'mongoose';
 
 const CoursePageSchema = new Schema({
-    
     name: {
         type: String,
-        require: true
+        required: true
     },
     of_module: {
         type: mongoose.Schema.Types.ObjectId,
-        require: true
+        required: true
     },
     page_number: {
         type: Number,
-        require: true
+        required: true
     },
     html: {
         type: String,
-        require: true
+        required: true
     }
+}, { timestamps: true })
 
-}, { timestamps: true });
+const course_page = mongoose.model('course_page', CoursePageSchema)
+course_page.createIndexes()
 
-const course_page = mongoose.model('course_page', CoursePageSchema);
-course_page.createIndexes();
-
-module.exports = course_page;
+export default course_page

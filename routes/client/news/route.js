@@ -1,24 +1,14 @@
-const express = require('express');
+import express from 'express'
+import NewsSchema from '../../../models/news_letter.js'
+import errorMiddleware from '../../../middleware/error.js'
+import nodemailer from 'nodemailer'
+import { body } from 'express-validator'
+import BodyValidator from '../../../middleware/BodyValidator.js'
+
 const router = express.Router();
-const NewsSchema = require('../models/news_letter');
-const errorMiddleware = require('../middleware/error');
-const nodemailer = require('nodemailer')
-const { body, validationResult } = require('express-validator');
 
-// Get all Subscriber data || Login Require 
-router.get('/', async (req, res, next) => {
-    try {
-
-        let data = await NewsSchema.find({});
-        return res.status(200).json(data);
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-});
-
-
-router.post('/subscribe', [
+// Route 1: NEWS letter subscription
+router.post('/', [
 
     body('name').exists().withMessage("Name is required!").isLength({ min: 3 }).withMessage("Name is too short!"),
     body('email').exists().withMessage("Eamil is required!").isEmail().withMessage("Not a valid email!"),
@@ -30,12 +20,7 @@ router.post('/subscribe', [
         return true
     }),
 
-], async (req, res, next) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array()[0].msg);
-    }
+], BodyValidator, async (req, res, next) => {
 
     try {
 
@@ -45,6 +30,7 @@ router.post('/subscribe', [
             "email": email,
             "type": type
         })
+
         await data.save()
 
         await nodemailer.createTransport({
@@ -272,52 +258,25 @@ router.post('/subscribe', [
         return res.status(201).json("Successfully Subscribed")
 
     } catch (error) {
-        errorMiddleware(error, req, res, next);
+        errorMiddleware(error, req, res, next)
     }
 })
 
 
-// first get confirmation via email for deletion
-router.get('/:email', async (req, res, next) => {
+// Route 1: Unsubscribe news -> Directly via user
+router.post('/unsubscribe', [
+    body('email').exists().withMessage("Email not found").isEmail().withMessage("Not a valid email")
+], BodyValidator, async (req, res, next) => {
     try {
-
-        let path = __dirname.split("routes")[0] + "/static/ejs/unsubscribe.ejs"
-        let data = {
-            "frontendHost": process.env.FRONTENDHOST,
-            "backendhost": process.env.BACKENDHOST,
-            "email": req.params.email,
-            "social": {
-                "linkedin": process.env.SOCIAL_LINKEDIN,
-                "insta": process.env.SOCIAL_INSTA,
-                "facebook": process.env.SOCIAL_FACEBOOK,
-                "github": process.env.SOCIAL_GITHUB,
-                "mail": process.env.SOCIAL_MAIL,
-                "resume": process.env.SOCIAL_RESUME,
-            },
-        }
-        res.render(path, data)
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-})
-
-
-// Unsubscribe news -> Directly via user
-router.post('/unsubscribe/:email', async (req, res, next) => {
-    try {
-
-        let data = await NewsSchema.findOneAndUpdate({ email: req.params.email }, { $set: { status: false } })
-
-        if (data._id) {
+        const data = await NewsSchema.findOneAndUpdate({ email: req.body.email }, { $set: { status: false } })
+        if (data) {
             return res.status(200).json("unsubscribe done")
-        } else { 
-            return res.status(200).json("No Data Found")
+        } else {
+            return res.status(404).json("Given email not found in list")
         }
-
     } catch (error) {
-        errorMiddleware(error, req, res, next);
+        errorMiddleware(error, req, res, next)
     }
 })
 
-module.exports = router;
+export default router

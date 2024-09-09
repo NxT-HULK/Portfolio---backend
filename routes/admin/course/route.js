@@ -1,42 +1,19 @@
-const express = require('express');
+import express from 'express'
+import errorMiddleware from '../../../middleware/error.js'
+import Course from '../../../models/course.js'
+import CoursePageSchema from '../../../models/course_page.js'
+import CourseModuleSchema from '../../../models/course_module.js'
+import { body } from 'express-validator';
+import BodyValidator from '../../../middleware/BodyValidator.js'
+import { AuthorityMatch__CourseWritter } from '../../../middleware/VerifyAdmin.js';
+
+
 const router = express.Router();
-const errorMiddleware = require('../middleware/error');
-const { body } = require('express-validator');
-const Course = require('../models/course');
-const CourseModuleSchema = require('../models/course_module')
-const CoursePageSchema = require('../models/course_page')
-const BodyValidator = require('../middleware/body_validator');
+router.use(AuthorityMatch__CourseWritter)
 
 
-// default get method
+// Route 1: Get all course
 router.get('/', async (req, res, next) => {
-    try {
-
-        let allCourses = await Course.find({ status: true, modules: { $exists: true, $ne: [] } });
-
-        allCourses = await Promise.all(allCourses.map(async (ele) => {
-            let curr = { ...ele.toObject() };
-            curr['first_module'] = curr.modules[0];
-            let moduleData = await CourseModuleSchema.findById(curr.modules[0]);
-            if (moduleData && moduleData.pages && moduleData.pages.length > 0) {
-                curr['first_page'] = moduleData.pages[0];
-            } else {
-                curr['first_page'] = 0;
-            }
-
-            return curr;
-        }));
-
-        return res.status(200).json({ 'courses': allCourses });
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-});
-
-
-// get course data for admin || admin login require
-router.get('/admin/', async (req, res, next) => {
     try {
         let allCourses = await Course.find({})
 
@@ -54,39 +31,15 @@ router.get('/admin/', async (req, res, next) => {
             return curr;
         }));
 
-        return res.status(200).json({ 'courses': allCourses });
+        return res.status(200).json(allCourses);
 
     } catch (error) {
         errorMiddleware(error, req, res, next);
     }
-});
-
-
-// Get details from entire course --> createdDate and lastUpdatedAt
-router.post('/last-updated', [
-    body('course_id').exists().withMessage('Course ID not found').isMongoId().withMessage("Course ID not valid!")
-], BodyValidator, async (req, res, next) => {
-    try {
-        let course = await Course.findById({ _id: req.body.course_id });
-        if (!course) {
-            return res.status(401).json('Unauthorize!')
-        }
-
-        let pages = await CoursePageSchema.find({ of_module: { $in: course.modules } }).select('-html')
-
-        let createdAt = pages.toSorted((a, b) => a.updatedAt - b.updatedAt)[0]?.updatedAt
-        let lastUpdated = pages.toSorted((a, b) => b.updatedAt - a.updatedAt)[0]?.updatedAt
-
-        return res.status(200).json({
-            'start': createdAt,
-            'last': lastUpdated
-        })
-    } catch (error) {
-        errorMiddleware(error, req, res, next)
-    }
 })
 
-// create new course || update old course data (basic Data)
+
+// Route 2: Create new course || Update old course data (basic Data)
 router.post('/', [
     body('name').exists().withMessage('Please define course name').isLength({ min: 25 }).withMessage('Course name is too short'),
     body('img').exists().withMessage('Please input background img url').isURL().withMessage('Not a valid link').custom((value) => {
@@ -140,7 +93,7 @@ router.post('/', [
 })
 
 
-// push modules in course
+// Route 3: push modules in course || Update old Module
 router.put('/add_module', [
     body('course_id').exists().withMessage('Please provide course id').isMongoId().withMessage('Not a valid mongo object id!'),
     body('module_name').exists().withMessage('Please input module name').isLength({ min: 15 }).withMessage('Module name is too short').isLength({ max: 100 }).withMessage('Module name is too long!'),
@@ -190,33 +143,17 @@ router.put('/add_module', [
 })
 
 
-// Get module array || input: [ModuleID]
-router.post('/modules', [
-    body('module_arr').exists().withMessage('Please define module array').isArray({ min: 1 }).withMessage('Module array is empty')
-], BodyValidator, async (req, res, next) => {
-
-    try {
-
-        let { module_arr } = req.body
-        let modules = await CourseModuleSchema.find({ _id: { $in: module_arr } })
-        return res.status(200).json(modules)
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next)
-    }
-})
-
-
-// push pages in course[module][page]
+// Route 4: push pages in course[module][page] || Update old page
 router.put('/modules/add_page', [
-    body('module_id').exists().withMessage('Please define module id').isMongoId().withMessage('Now a valid course id!'),
+    body('module_id').exists().withMessage('Please define module id').isMongoId().withMessage('Not a valid module id!'),
     body('page_name').exists().withMessage('Please provide name of page').isLength({ min: 10 }).withMessage('Page name is too short!'),
     body('page_number').exists().withMessage('Please provide page number').isNumeric().withMessage('Invalid page number'),
     body('html').exists().withMessage('Please provide details of page').isLength({ min: 100 }).withMessage('Page content is too short!')
 ], BodyValidator, async (req, res, next) => {
-
+    
+    let { module_id, page_name, page_number, html, updateFlag, pageId } = req.body
+    
     try {
-        let { module_id, page_name, page_number, html, updateFlag, pageId } = req.body
         if (!updateFlag) {
             let page = new CoursePageSchema({
                 name: page_name,
@@ -256,27 +193,8 @@ router.put('/modules/add_page', [
 })
 
 
-// get all pages of selected modules
-router.post('/modules/pages', [
-    body('module_id').exists().withMessage('Please define module id!').isMongoId().withMessage('Not a valid module id!')
-], BodyValidator, async (req, res, next) => {
-    try {
-        let { module_id } = req.body
-        let coourseModule = await CourseModuleSchema.findOne({ _id: module_id })
-
-        let arr = coourseModule.pages
-        let allPages = await CoursePageSchema.find({ _id: { $in: arr } })
-
-        return res.status(200).json(allPages)
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next)
-    }
-})
-
-
-// delete particular page endpoint
-router.delete('/modules/page', [
+// Route 5: delete particular page endpoint
+router.post('/modules/page', [
     body('module_id').exists().withMessage('Please define module id!').isMongoId().withMessage('Not a valid module id!'),
     body('page_id').exists().withMessage('Please define page id!').isMongoId().withMessage('Not a valid page id')
 ], BodyValidator, async (req, res, next) => {
@@ -289,7 +207,7 @@ router.delete('/modules/page', [
         await CourseModuleSchema.findOneAndUpdate({ _id: module_id }, { $pull: { pages: page_id } })
         await CoursePageSchema.findOneAndDelete({ _id: page_id })
 
-        return res.status(200).json({ message: `PAGE: "${page.name}" has been deleted` })
+        return res.status(200).json(`PAGE: "${page.name}" has been deleted`)
 
     } catch (error) {
         errorMiddleware(error, req, res, next)
@@ -298,8 +216,8 @@ router.delete('/modules/page', [
 })
 
 
-// delete particular module of course
-router.delete('/module', [
+// Route 6: delete particular module of course
+router.post('/module', [
     body('course_id').exists().withMessage('Please provide course id').isMongoId().withMessage('Not a valid course id!'),
     body('module_id').exists().withMessage('Please provide module id').isMongoId().withMessage('Not a valid module id!')
 ], BodyValidator, async (req, res, next) => {
@@ -344,8 +262,8 @@ router.delete('/module', [
 })
 
 
-// delete a particular course
-router.delete('/', [
+// Route 7: delete a particular course
+router.post('/delete-course', [
     body('course_id').exists().withMessage('Please define course id').isMongoId().withMessage('Not a valid course id!')
 ], BodyValidator, async (req, res, next) => {
 
@@ -380,47 +298,7 @@ router.delete('/', [
 });
 
 
-// learning matarial provider
-router.get('/learning-matarial/:course_id', async (req, res) => {
-    try {
-
-        let _id = req.params.course_id;
-        let course = null
-        if (req.headers.admin === "true") {
-            course = await Course.findOne({ _id });
-        } else {
-            course = await Course.findOne({ _id, status: true });
-        }
-
-        let modules = course?.modules;
-
-        if (!course) {
-            return res.status(400).json({ modules: [], pages: [] });
-        }
-
-        if (!course && modules.length === 0) {
-            return res.status(400).json({ modules: [], pages: [] });
-        }
-
-        let module_details = await CourseModuleSchema.find({ _id: { $in: modules } });
-        let all_pages = [];
-        module_details.forEach(ele => {
-            all_pages = [...all_pages, ...ele.pages];
-        });
-
-        // Fetch complete page details
-        let page_details = await CoursePageSchema.find({ _id: { $in: all_pages } });
-
-        return res.status(200).json({ modules: module_details, pages: page_details });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json('Server Error, ON_GETTING_LEARNING_MATERIAL');
-    }
-});
-
-
-// Updating course status
+// Route 8: Updating course status
 router.put('/update_status', [
 
     body('course_id').exists().withMessage("Course ID not found").isMongoId().withMessage("Not a valid course ID"),
@@ -453,4 +331,43 @@ router.put('/update_status', [
 
 })
 
-module.exports = router;
+// getting course material
+router.post('/learning-material/', [
+    
+    body('course').exists().withMessage("Course not exist").isMongoId().withMessage("Not a valid mongo ID")
+
+], async (req, res) => {
+    try {
+
+        let _id = req.body.course;
+        
+        let course = await Course.findOne({ _id });
+        let modules = course?.modules;
+
+        if (!course) {
+            return res.status(400).json({ modules: [], pages: [] });
+        }
+
+        if (!course && modules.length === 0) {
+            return res.status(400).json({ modules: [], pages: [] });
+        }
+
+        let module_details = await CourseModuleSchema.find({ _id: { $in: modules } });
+        let all_pages = [];
+        module_details.forEach(ele => {
+            all_pages = [...all_pages, ...ele.pages];
+        });
+
+        // Fetch complete page details
+        let page_details = await CoursePageSchema.find({ _id: { $in: all_pages } });
+
+        return res.status(200).json({ modules: module_details, pages: page_details });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json('Server Error, ON_GETTING_LEARNING_MATERIAL');
+    }
+});
+
+
+export default router

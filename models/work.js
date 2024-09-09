@@ -1,5 +1,4 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose;
+import mongoose, { Schema } from "mongoose"
 
 const WorkSchema = new Schema({
     name: {
@@ -8,36 +7,36 @@ const WorkSchema = new Schema({
     },
     shortDesc: {
         type: String,
-        require: true,
+        required: true,
     },
     html: {
         type: String,
-        require: true,
+        required: true,
     },
     link: {
         type: String,
-        require: true,
+        required: true,
     },
     background: {
         type: String,
-        require: true
+        required: true
     },
     techUsed: {
         type: [String],
-        require: true
+        required: true
     },
     type: {
         type: String,
-        require: true
+        required: true
     },
     order: {
         type: Number,
-        require: true,
+        required: true,
         default: 9999
     }
-}, { timestamps: true });
+}, { timestamps: true })
 
-const work = mongoose.model('work', WorkSchema);
-work.createIndexes();
+const work = mongoose.model('work', WorkSchema)
+work.createIndexes()
 
-module.exports = work;
+export default work

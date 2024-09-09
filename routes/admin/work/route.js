@@ -1,97 +1,106 @@
-const express = require('express');
-const router = express.Router();
-const TestimonialSchema = require('../models/testimonial');
-const errorMiddleware = require('../middleware/error');
-const nodemailer = require('nodemailer')
-const { body, validationResult } = require('express-validator');
+import express from 'express'
+import NewsLetterSchema from '../../../models/news_letter.js'
+import errorMiddleware from '../../../middleware/error.js'
+import nodemailer from 'nodemailer'
+import { body } from 'express-validator'
+import WorkSchema from '../../../models/work.js'
+import BodyValidator from '../../../middleware/BodyValidator.js'
+import { AuthorityMatch__Admin } from '../../../middleware/VerifyAdmin.js'
 
-// Get all testimonial data
+const router = express.Router()
+
+
+// Middleware checkup
+router.use(AuthorityMatch__Admin)
+
+
+// Get all work data
 router.get('/', async (req, res, next) => {
     try {
 
-        let data = await TestimonialSchema.find({ status: true });
-        return res.status(200).json(data);
+        let data = await WorkSchema.find({})
+        return res.status(200).json(data)
+
 
     } catch (error) {
-        errorMiddleware(error, req, res, next);
+        errorMiddleware(error, req, res, next)
     }
-});
+})
 
 
-// POST testiminal data and alsop send email
+// POST a work data
 router.post('/', [
-    body('name').exists().withMessage("Name is required!").isLength({ min: 3 }),
-    body('rating')
-        .exists().withMessage('Rating is required')
-        .isNumeric().withMessage('Rating must be a number')
-        .custom((value) => {
-            const numericValue = parseFloat(value);
-            if (numericValue < 1 || numericValue > 5) {
-                throw new Error('Rating must be between 1 and 5');
-            }
-            return true;
-        }),
-    body('mess').exists().withMessage("Testimonial requires you words!").custom((value) => {
-        const endRange = 300
-        if (value.length < 5 || value.length > endRange) {
-            throw new Error(`Your message should be in range of 5 to ${endRange} letters!`)
+
+    body('type').exists().withMessage("Type of work must be defined!").custom((value) => {
+        value = value.toLowerCase()
+        let arr = ["professional", "personal", "hobby"]
+        if (arr.indexOf(value) === -1) {
+            throw new Error('Not a valid type of work')
         }
         return true
-    })
-], async (req, res, next) => {
+    }),
+    body('name').exists().withMessage("Project name is required!").isLength({ min: 5 }).withMessage("Project Name is too short"),
+    body('shortDesc').exists().withMessage("Short Description is required").isLength({ min: 200 }).withMessage("Message is too short"),
+    body('html').exists().withMessage("Modal message is required").isLength({ min: 100 }).withMessage("HTML code is too short"),
+    body('link').exists().withMessage("Project link is required to represent proof").isURL().withMessage("Project link is not valid"),
+    body('background').exists().withMessage("Background image (Card Background) is required and it should be in google drive").isURL().withMessage("Not a valid background URL"),
+    body('techUsed').exists().withMessage("You have to mention which technology you've used").isArray({ min: 3 }).withMessage('At least three technologies must be specified'),
+    body('mailFlag').exists().withMessage("MailFlag not fount").isBoolean().withMessage("Invalid mail flag value")
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array());
-    }
-
+], BodyValidator, async (req, res, next) => {
     try {
-        let { name, rating, mess, email } = req.body
 
-        let data = new TestimonialSchema({
-            "name": name,
-            "rating": rating,
-            "mess": mess,
-            "email": email ? email : '',
+        let { name, shortDesc, html, link, background, techUsed, type, mailFlag } = req.body
+
+        let work = new WorkSchema({ name, shortDesc, html, link, background, techUsed, type })
+        await work.save()
+
+        let techStack_String = ""
+        techUsed.forEach((ele) => {
+            techStack_String += `- ${ele}<br/>`
         })
-        data.save()
 
-        let testimonial_id = data._id;
+        let counter = 0
+        if (mailFlag === true) {
+            await NewsLetterSchema.find({ status: true, type: { $in: ['all', 'projects'] } }).then(async (data) => {
+                let allEmail = data.map((ele) => {
+                    return ele?.email
+                })
 
-        if (email) {
-            // Thanks and greet to recipitent
-            await nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.MAILINGADDRESS,
-                    pass: process.env.MAILINGKEY
-                }
-            }).sendMail({
-                from: process.env.MAILINGADDRESS,
-                to: email,
-                subject: "Thank You for Sharing Your Testimonial! 😊",
-                html: `<p> Dear ${name}, <br>
-                                I hope this message finds you well. We wanted to express our sincere gratitude for taking the time to share your
-                                thoughts and experiences with us. Your testimonial is incredibly valuable to our team, and we're honored to have
-                                your feedback.
-                            </p>
-                
-                            <p>
-                                Your words mean a lot to us, and they play a crucial role in shaping the success of our frelancing services. We
-                                appreciate your effort in providing such positive and insightful feedback.
-                            </p>
-                            
-                            <p>
-                                If you have any additional thoughts or feedback you'd like to share, please feel free to reach out to us. We're
-                                always here to listen and continuously improve our offerings.
-                            </p>
-                            
-                            <p>
-                                Once again, thank you for being a part of our community and for contributing to our success. We look forward to
-                                serving you and providing an even better experience in the future.
-                            <p>
-                            
-                            <table cellpadding="0" cellspacing="0" border="0" width="500" style="border: none; font-size: 100%; line-height: 1; width: 500px; border-collapse: collapse; font-family: &quot;Comic Sans MS&quot;, cursive;">
+                await nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.MAILINGADDRESS,
+                        pass: process.env.MAILINGKEY
+                    }
+                }).sendMail({
+                    from: process.env.MAILINGADDRESS,
+                    to: allEmail,
+                    subject: `🚀 Exciting News! Successful Completion of Project - ${name} 🚀`,
+                    html: `
+                        <p style="color: #000; margin-bottom: 0;"> Hello Subscriber, </p>
+                        <p style="color: #000; margin-top: 0;">
+                            We are thrilled to share with you the exciting news of the successful completion of our latest project,
+                            <b>${name}</b> 🎉. This milestone represents a significant achievement for our team, and we are eager to share the
+                            details of our hard work and dedication.
+                        </p>
+
+                        <p style="color: #000; margin-bottom: 0; font-size: 18px;"> <b>🔍 Ideation:</b> </p>
+                        <p style="color: #000; margin-top: 0;">
+                            The journey of ${name} began with a vision to, "${shortDesc}". We faced various challenges, navigated through
+                            complexities, and emerged successful in achieving our desired outcomes. The significance of this project cannot be
+                            overstated, and we are excited to showcase the results of our dedication.
+                        <p>
+
+                        <p style="color: #000; margin-bottom: 0; font-size: 18px;"> <b>🔧 Technology Stack:</b> </p>
+                        ${techStack_String}
+
+                        <p style="color: #000; margin-bottom: 0; font-size: 18px;"> <b>🌐 Project Demo:</b> </p>
+                        <p style="color: #000; margin-top: 0;">Explore a demonstration of ${name} - ${link}. 🖥️ </p>
+
+                        <p style="color: #000;">Thank you for your continued support, and we look forward to hearing your feedback on Project - ${name}.</p>
+
+                        <table cellpadding="0" cellspacing="0" border="0" width="500" style="border: none; font-size: 100%; line-height: 1; width: 500px; border-collapse: collapse; font-family: &quot;Comic Sans MS&quot;, cursive;">
                             <tbody>
                                 <tr style="width: 100%;">
                                     <td>
@@ -291,84 +300,77 @@ router.post('/', [
                             </tbody>
                         </table>
 
-                            <span style="color: #ccc; font-size: 14px;"> This is an automated email to deliver an exciting update. </span>
-                    `
-            }).then(async () => {
-                // Verification of data via admin
-                await nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: process.env.MAILINGADDRESS,
-                        pass: process.env.MAILINGKEY
-                    }
-                }).sendMail({
-                    from: process.env.MAILINGADDRESS,
-                    to: process.env.OWNERMAIL,
-                    subject: "Got a Testimonial 😉",
-                    html: `
-                        From: ${email} <br />
-                        Name: ${name} <br />
-                        Rating: ${rating} <br />
-                        Mess: <br /><br />
-                        ${mess}
-                        <br/><br/>
-                        
-                        <big>
-                            <strong>
-                                <a href="${process.env.BACKENDHOST}/testimonial/update-status/${testimonial_id}">
-                                    Verify Testimonial Now!
-                                </a>
-                            </strong>
-                        </big>
-                    `
+                        <span style="color: #ccc; font-size: 14px;"> This is an automated email to deliver an exciting update. </span>
+                        `
                 })
+
+                counter = allEmail?.length
             })
         }
 
-        return res.status(201).json("Your testimonial has made our day - Thank you!")
+        if(mailFlag === true) {
+            return res.status(201).json(`Work Post added and mail to: ${counter} people`)
+        } else {
+            return res.status(201).json("Work Posting success")
+        }
 
     } catch (error) {
-        errorMiddleware(error, req, res, next);
+        errorMiddleware(error, req, res, next)
+        console.log('PROJECT SECTION ERROR', error)
     }
 })
 
 
-// Verify via Admin || Login Require
-router.get('/update-status/:_id', async (req, res, next) => {
-    try {
-
-        const id = req.params._id
-        await TestimonialSchema.findByIdAndUpdate({ _id: id }, { $set: { status: true } })
-        return res.status(200).json("Status has been updated")
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-})
-
-
-// Delete via Admin || Login require || Current not in use
+// delete a work data || Admin Login Require
 router.delete('/:_id', async (req, res, next) => {
     try {
 
-        const id = req.params._id
-        await TestimonialSchema.findByIdAndDelete({ _id: id })
-        return res.status(200).json("Data has been deleted")
+        let deleted = await WorkSchema.findByIdAndDelete({ _id: req.params._id })
+        if (deleted)
+            return res.status(200).json("Data has been deleted")
+        else
+            return res.status(404).json("Unauthorize access not allowed")
 
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-})
-
-
-// get all testimonial data
-router.get('/get-all', async (req, res, next) => { 
-    try {
-        let data = await TestimonialSchema.find({})
-        return res.status(200).json(data)
     } catch (error) {
         errorMiddleware(error, req, res, next)
     }
 })
 
-module.exports = router;
+
+// setting up order of project
+router.post('/change-order', [
+
+    body('order').exists().withMessage("Work order not found").custom((val) => {
+        if (val > 0) {
+            return true
+        }
+
+        throw new Error("Negative and zero value not allowed!")
+    }),
+    body('_id').exists().withMessage("Project ID not found").isMongoId().withMessage("Unauthorize access not allowed")
+
+], BodyValidator, async (req, res, next) => {
+    try {
+
+        let { order, _id } = req.body
+
+        await WorkSchema.findByIdAndUpdate(
+            { _id: _id },
+            { $set: { order: order } }
+        )
+
+        let data = await WorkSchema.findOne({ _id: _id })
+
+        if (data.order === order * 1) {
+            return res.status(200).json(data)
+        } else {
+            return res.status(400).json("Bad Request")
+        }
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
+
+
+export default router

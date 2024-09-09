@@ -1,5 +1,4 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose;
+import mongoose, { Schema } from "mongoose"
 
 const TestimonialSchema = new Schema({
     name: {
@@ -8,24 +7,23 @@ const TestimonialSchema = new Schema({
     },
     rating: {
         type: Number,
-        require: true
+        required: true
     },
     mess: {
         type: String,
-        require: true
+        required: true
     },
     email: {
-        type: String,
-        require: true
+        type: String
     },
     status: {
         type: Boolean,
-        require: true,
+        required: true,
         default: false
     }
-}, { timestamps: true });
+}, { timestamps: true })
 
-const ask = mongoose.model('testimonials', TestimonialSchema);
-ask.createIndexes();
+const Testimonial = mongoose.model('testimonials', TestimonialSchema)
+Testimonial.createIndexes()
 
-module.exports = ask;
+export default Testimonial

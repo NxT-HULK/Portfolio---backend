@@ -1,26 +1,16 @@
-const express = require('express');
+import express from 'express'
+import nodemailer from 'nodemailer'
+import { body } from 'express-validator'
+import ContactSchema from '../../../models/contact.js'
+import errorMiddleware from '../../../middleware/error.js'
+import BodyValidator from '../../../middleware/BodyValidator.js'
+
 const router = express.Router();
-const ContactSchema = require('../models/contact');
-const errorMiddleware = require('../middleware/error');
-const nodemailer = require('nodemailer')
-const { body, validationResult } = require('express-validator');
 
 
-// Get all Contact data || Login Require 
-router.get('/', async (req, res, next) => {
-    try {
-
-        let data = await ContactSchema.find({});
-        return res.status(200).json(data);
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-});
-
-
-// POST testiminal data and alsop send email
+// 1. Route: Post contact data
 router.post('/', [
+    
     body('name').exists().withMessage("Name is required!").isLength({ min: 3 }),
     body('mess').exists().withMessage("Did you forgot to fill your message ?").custom((value) => {
         const endRange = 500
@@ -37,12 +27,8 @@ router.post('/', [
         return true
     }),
     body('email').exists().withMessage("Please provide your email so that we can contact you!").isEmail().withMessage("Input email is invalid! Please double-check your entry.")
-], async (req, res, next) => {
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array());
-    }
+], BodyValidator, async (req, res, next) => {
 
     try {
         let { name, query, mess, email } = req.body
@@ -307,23 +293,9 @@ router.post('/', [
         return res.status(201).json("Thank you for getting in touch! We'll be in contact with you shortly.")
 
     } catch (error) {
-        errorMiddleware(error, req, res, next);
+        errorMiddleware(error, req, res, next)
     }
 })
 
 
-// Delete via Admin || Login require
-router.delete('/:_id', async (req, res, next) => {
-    try {
-
-        const id = req.params._id
-        await ContactSchema.findByIdAndDelete({ _id: id })
-        return res.status(200).json(id)
-
-    } catch (error) {
-        errorMiddleware(error, req, res, next);
-    }
-})
-
-
-module.exports = router;
+export default router

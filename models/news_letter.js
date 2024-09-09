@@ -1,5 +1,4 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose;
+import mongoose, { Schema } from "mongoose"
 
 const NewsLetter = new Schema({
     name: {
@@ -8,21 +7,20 @@ const NewsLetter = new Schema({
     },
     email: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     type: {
         type: String,
-        require: true
+        required: true
     },
     status: {
         type: Boolean,
-        require: true,
+        required: true,
         default: true
     }
-}, { timestamps: true });
+}, { timestamps: true })
 
-const news = mongoose.model('news_letter', NewsLetter);
-news.createIndexes();
+const news = mongoose.model('news_letter', NewsLetter)
 
-module.exports = news;
+export default news

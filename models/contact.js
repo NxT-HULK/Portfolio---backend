@@ -1,5 +1,4 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose;
+import mongoose, { Schema } from 'mongoose';
 
 const ContactSchema = new Schema({
     name: {
@@ -8,19 +7,19 @@ const ContactSchema = new Schema({
     },
     query: {
         type: String,
-        require: true
+        required: true
     },
     mess: {
         type: String,
-        require: true
+        required: true
     },
     email: {
         type: String,
-        require: true
+        required: true
     }
 }, { timestamps: true });
 
-const contact = mongoose.model('contact', ContactSchema);
-contact.createIndexes();
+const Contact = mongoose.model('contact', ContactSchema)
+Contact.createIndexes()
 
-module.exports = contact;
+export default Contact
