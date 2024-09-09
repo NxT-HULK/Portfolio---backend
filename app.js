@@ -35,7 +35,7 @@ const corsOptions = {
 
 const initializeServer = () => {
     const app = express();
-    const port = process.env.PORT || 5000;
+    const port = process.env.PORT || 10000;
 
     // Middleware
     app.use(cors(corsOptions));
@@ -68,7 +68,7 @@ const initializeServer = () => {
         res.status(500).json({ message: 'Internal Server Error', error: err.message });
     });
 
-    const server = app.listen(port, () => {
+    const server = app.listen(() => {
         console.log(`Server is running on PORT: ${port}`);
     });
 
