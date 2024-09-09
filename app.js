@@ -60,7 +60,7 @@ const initializeServer = () => {
     // Routes
     app.use('/', DefaultRoute);
     app.use('/api/client/', ClientRoute);
-    app.use('/api/admin/', AdminRoute);
+    // app.use('/api/admin/', AdminRoute);
 
     // Error handling middleware
     app.use((err, req, res, next) => {
