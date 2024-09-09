@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import ConnectToDB from './middleware/ConnectToDB.js';
 import ClientRoute from './routes/client/site/route.js';
+import AdminRoute from './routes/admin/site/route.js'
 import DefaultRoute from './routes/site/route.js';
 
 dotenv.config();
