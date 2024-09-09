@@ -1,5 +1,3 @@
-import os from 'os';
-import cluster from 'cluster';
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
@@ -7,7 +5,6 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import ConnectToDB from './middleware/ConnectToDB.js';
 import ClientRoute from './routes/client/site/route.js';
-import AdminRoute from './routes/admin/site/route.js';
 import DefaultRoute from './routes/site/route.js';
 
 dotenv.config();
@@ -56,16 +53,12 @@ app.use((req, res, next) => {
 
 app.use(ConnectToDB);
 
+
 // Routes
 app.use('/', DefaultRoute);
 app.use('/api/client/', ClientRoute);
 // app.use('/api/admin/', AdminRoute);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Internal Server Error', error: err.message });
-});
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${port}`);
