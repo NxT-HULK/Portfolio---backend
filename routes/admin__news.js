@@ -1,7 +1,7 @@
 import express from 'express'
 import NewsSchema from '../models/news_letter.js'
 import errorMiddleware from '../middleware/error.js'
-import { AuthorityMatch__Admin } from '../middleware/VerifyAdmin.js';
+import { AuthorityMatch__Admin } from '../middleware/AuthorityVerification.js';
 
 const router = express.Router();
 

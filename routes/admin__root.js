@@ -1,5 +1,5 @@
 import express from 'express'
-import { VerifySubAdmin } from '../middleware/VerifyAdmin.js'
+import { VerifySubAdmin } from '../middleware/AuthorityVerification.js'
 import ContactRoute from './admin__contact.js'
 import MailRoute from './admin__mailing.js'
 import NewsRoute from './admin__news.js'

@@ -4,7 +4,7 @@ import { body } from 'express-validator'
 import NewsSchema from '../models/news_letter.js'
 import nodemailer from 'nodemailer'
 import BodyValidator from '../middleware/BodyValidator.js'
-import { AuthorityMatch__Admin } from '../middleware/VerifyAdmin.js'
+import { AuthorityMatch__Admin } from '../middleware/AuthorityVerification.js'
 
 const router = express.Router();
 

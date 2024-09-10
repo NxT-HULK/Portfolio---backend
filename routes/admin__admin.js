@@ -7,7 +7,7 @@ import BodyValidator from '../middleware/BodyValidator.js'
 import AdminSchema from '../models/admin_account.js'
 import bcrypt from 'bcryptjs'
 import nodemailer from 'nodemailer'
-import { VerifySuperAdmin } from '../middleware/VerifyAdmin.js'
+import { VerifySuperAdmin } from '../middleware/AuthorityVerification.js'
 
 const router = express.Router();
 

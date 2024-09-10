@@ -3,7 +3,7 @@ import { body } from 'express-validator'
 import errorMiddleware from '../middleware/error.js'
 import BodyValidator from '../middleware/BodyValidator.js'
 import NotificationSchema from '../models/notification.js'
-import { AuthorityMatch__Admin } from '../middleware/VerifyAdmin.js'
+import { AuthorityMatch__Admin } from '../middleware/AuthorityVerification.js'
 
 const router = express.Router();
 
