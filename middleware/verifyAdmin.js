@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import errorMiddleware from '../middleware/error.js'
+import errorMiddleware from './error.js'
 import AdminSchema from '../models/admin_account.js'
 
 // Middleware for verifying supper admin [logedin via using .env file]
