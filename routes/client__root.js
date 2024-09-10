@@ -1,10 +1,10 @@
 import express from 'express'
-import ContactRoute from '../contact/route.js'
-import NewsRoute from '../news/route.js'
-import NotificationRoute from '../notify/route.js'
-import TestimonialRoute from '../testimonial/route.js'
-import WorkRoute from '../work/route.js'
-import CourseRoute from '../course/route.js'
+import ContactRoute from './client__contact.js'
+import NewsRoute from './client__news.js'
+import NotificationRoute from './client__notify.js'
+import TestimonialRoute from './client__testimonial.js'
+import WorkRoute from './client__work.js'
+import CourseRoute from './client__course.js'
 
 const router = express.Router()
 

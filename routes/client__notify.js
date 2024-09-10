@@ -1,6 +1,6 @@
 import express from 'express'
-import errorMiddleware from '../../../middleware/error.js'
-import NotificationSchema from '../../../models/notification.js'
+import errorMiddleware from '../middleware/error.js'
+import NotificationSchema from '../models/notification.js'
 
 const router = express.Router();
 

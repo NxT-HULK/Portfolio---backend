@@ -1,13 +1,13 @@
 import express from 'express'
-import { VerifyAdmin } from '../../../middleware/VerifyAdmin.js'
-import ContactRoute from '../contact/route.js'
-import MailRoute from '../mailing/route.js'
-import NewsRoute from '../news/route.js'
-import NotificationRoute from '../notify/route.js'
-import TestimonialRoute from '../testimonial/route.js'
-import WorkRoute from '../work/route.js'
-import CourseRoute from '../course/route.js'
-import AdminAuthRoutes from '../admin/route.js'
+import { VerifyAdmin } from '../middleware/VerifyAdmin.js'
+import ContactRoute from './admin__contact.js'
+import MailRoute from './admin__mailing.js'
+import NewsRoute from './admin__news.js'
+import NotificationRoute from './admin__notify.js'
+import TestimonialRoute from './admin__testimonial.js'
+import WorkRoute from './admin__work.js'
+import CourseRoute from './admin__course.js'
+import AdminAuthRoutes from './admin__admin.js'
 
 
 // Admin verification directly here

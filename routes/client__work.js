@@ -1,6 +1,6 @@
 import express from 'express'
-import errorMiddleware from '../../../middleware/error.js'
-import WorkSchema from '../../../models/work.js'
+import errorMiddleware from '../middleware/error.js'
+import WorkSchema from '../models/work.js'
 
 const router = express.Router()
 

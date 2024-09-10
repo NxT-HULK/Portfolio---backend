@@ -1,9 +1,9 @@
 import express from 'express'
 import nodemailer from 'nodemailer'
 import { body } from 'express-validator'
-import ContactSchema from '../../../models/contact.js'
-import errorMiddleware from '../../../middleware/error.js'
-import BodyValidator from '../../../middleware/BodyValidator.js'
+import ContactSchema from '../models/contact.js'
+import errorMiddleware from '../middleware/error.js'
+import BodyValidator from '../middleware/BodyValidator.js'
 
 const router = express.Router();
 

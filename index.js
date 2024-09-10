@@ -4,11 +4,15 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import ConnectToDB from './middleware/ConnectToDB.js';
-import ClientRoute from './routes/client/site/route.js';
-import AdminRoute from './routes/admin/site/route.js'
-import DefaultRoute from './routes/site/route.js';
+import ClientRoute from './routes/client__root.js';
+import AdminRoute from './routes/admin__root.js'
+import DefaultRoute from './routes/default.js';
+
 
 dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 10000;
+
 
 const whitelist = [
     'http://localhost:3000',
@@ -30,9 +34,6 @@ const corsOptions = {
     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
-
-const app = express();
-const PORT = process.env.PORT || 10000;
 
 // Middleware
 app.use(cors(corsOptions));

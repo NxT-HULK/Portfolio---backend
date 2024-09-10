@@ -1,10 +1,10 @@
 import express from 'express'
-import errorMiddleware from '../../../middleware/error.js'
-import Course from '../../../models/course.js'
+import errorMiddleware from '../middleware/error.js'
+import Course from '../models/course.js'
 import { body } from 'express-validator';
-import BodyValidator from '../../../middleware/BodyValidator.js'
-import CourseModuleSchema from '../../../models/course_module.js'
-import CoursePageSchema from '../../../models/course_page.js'
+import BodyValidator from '../middleware/BodyValidator.js'
+import CourseModuleSchema from '../models/course_module.js'
+import CoursePageSchema from '../models/course_page.js'
 
 const router = express.Router();
 

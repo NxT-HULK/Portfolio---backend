@@ -1,10 +1,10 @@
 import express from 'express'
-import errorMiddleware from '../../../middleware/error.js'
+import errorMiddleware from '../middleware/error.js'
 import { body } from 'express-validator'
-import NewsSchema from '../../../models/news_letter.js'
+import NewsSchema from '../models/news_letter.js'
 import nodemailer from 'nodemailer'
-import BodyValidator from '../../../middleware/BodyValidator.js'
-import { AuthorityMatch__Admin } from '../../../middleware/VerifyAdmin.js'
+import BodyValidator from '../middleware/BodyValidator.js'
+import { AuthorityMatch__Admin } from '../middleware/VerifyAdmin.js'
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import express from 'express'
-import ContactSchema from '../../../models/contact.js'
-import errorMiddleware from '../../../middleware/error.js'
-import { AuthorityMatch__Admin } from '../../../middleware/VerifyAdmin.js';
+import ContactSchema from '../models/contact.js'
+import errorMiddleware from '../middleware/error.js'
+import { AuthorityMatch__Admin } from '../middleware/VerifyAdmin.js';
 
 const router = express.Router();
 
