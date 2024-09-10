@@ -26,7 +26,7 @@ export const VerifySuperAdmin = async (req, res, next) => {
 
 
 // Middleware for verifying Admin & CourseWritter & BlogWritter
-export const VerifyAdmin = async (req, res, next) => {
+export const VerifySubAdmin = async (req, res, next) => {
     try {
 
         let { authToken } = req.cookies

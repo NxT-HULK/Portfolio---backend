@@ -1,5 +1,5 @@
 import express from 'express'
-import { VerifyAdmin } from '../middleware/VerifyAdmin.js'
+import { VerifySubAdmin } from '../middleware/VerifyAdmin.js'
 import ContactRoute from './admin__contact.js'
 import MailRoute from './admin__mailing.js'
 import NewsRoute from './admin__news.js'
@@ -18,7 +18,7 @@ const router = express.Router()
 router.use("/", AdminAuthRoutes)
 
 // From here all routes will be secured via VerifyAdmin [Admin & CourseWritter & BlogWritter]
-router.use(VerifyAdmin)
+router.use(VerifySubAdmin)
 
 // Route 1: Contact route
 router.use('/contact', ContactRoute)
