@@ -5,6 +5,7 @@ import NotificationRoute from './client__notify.js'
 import TestimonialRoute from './client__testimonial.js'
 import WorkRoute from './client__work.js'
 import CourseRoute from './client__course.js'
+import FeedbackRoute from './client__feedback.js'
 
 const router = express.Router()
 
@@ -25,5 +26,8 @@ router.use('/work', WorkRoute)
 
 // Route 6: Course route
 router.use('/course', CourseRoute)
+
+// Route 7: Feedback route
+router.use('/feedback', FeedbackRoute)
 
 export default router

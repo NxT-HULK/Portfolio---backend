@@ -33,6 +33,10 @@ const WorkSchema = new Schema({
         type: Number,
         required: true,
         default: 9999
+    },
+    feedback: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'work_feedback'
     }
 }, { timestamps: true })
 

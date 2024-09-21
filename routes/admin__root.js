@@ -8,6 +8,7 @@ import TestimonialRoute from './admin__testimonial.js'
 import WorkRoute from './admin__work.js'
 import CourseRoute from './admin__course.js'
 import AdminAuthRoutes from './admin__admin.js'
+import FeedbackRoute from './admin__feedback.js'
 
 
 // Admin verification directly here
@@ -40,5 +41,8 @@ router.use('/work', WorkRoute)
 
 // Route 7: Course route
 router.use("/course", CourseRoute)
+
+// Route 8: Feedback handling
+router.use("/feedback", FeedbackRoute)
 
 export default router
