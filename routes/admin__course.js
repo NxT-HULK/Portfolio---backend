@@ -176,8 +176,7 @@ router.put('/modules/add_page', [
                 $set: {
                     name: page_name,
                     page_number: page_number,
-                    html: html,
-                    status: false
+                    html: html
                 }
             })
 
