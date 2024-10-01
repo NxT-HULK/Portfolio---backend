@@ -150,16 +150,17 @@ router.put('/modules/add_page', [
     body('page_number').exists().withMessage('Please provide page number').isNumeric().withMessage('Invalid page number'),
     body('html').exists().withMessage('Please provide details of page').isLength({ min: 100 }).withMessage('Page content is too short!')
 ], BodyValidator, async (req, res, next) => {
-    
+
     let { module_id, page_name, page_number, html, updateFlag, pageId } = req.body
-    
+
     try {
         if (!updateFlag) {
             let page = new CoursePageSchema({
                 name: page_name,
                 of_module: module_id,
                 page_number: page_number,
-                html: html
+                html: html,
+                status: false
             })
 
             await page.save()
@@ -175,7 +176,8 @@ router.put('/modules/add_page', [
                 $set: {
                     name: page_name,
                     page_number: page_number,
-                    html: html
+                    html: html,
+                    status: false
                 }
             })
 
@@ -331,16 +333,16 @@ router.put('/update_status', [
 
 })
 
-// getting course material
+// Route 9: Getting course material
 router.post('/learning-material/', [
-    
+
     body('course').exists().withMessage("Course not exist").isMongoId().withMessage("Not a valid mongo ID")
 
 ], async (req, res) => {
     try {
 
         let _id = req.body.course;
-        
+
         let course = await Course.findOne({ _id });
         let modules = course?.modules;
 
@@ -368,6 +370,29 @@ router.post('/learning-material/', [
         return res.status(500).json('Server Error, ON_GETTING_LEARNING_MATERIAL');
     }
 });
+
+
+// Route 10: Toggle page status
+router.post('/toggle-page-status', [
+
+    body('id').exists().withMessage("Page ID not found").isMongoId().withMessage("Page ID not valid"),
+    body('flag').exists().withMessage("Status flag not found").isBoolean().withMessage("Page flag is not valid")
+
+], BodyValidator, async (req, res, next) => {
+    try {
+
+        const { id, flag } = req.body
+        const update = await CoursePageSchema.findByIdAndUpdate({ _id: id }, { $set: { status: flag } })
+
+        if (update)
+            return res.status(200).json(`Page: ${update?.name} || status: ${flag} `)
+        else
+            return res.status(404).json("Page not found")
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
 
 
 export default router

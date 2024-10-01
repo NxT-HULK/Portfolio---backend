@@ -16,6 +16,10 @@ const CoursePageSchema = new Schema({
     html: {
         type: String,
         required: true
+    },
+    status: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 

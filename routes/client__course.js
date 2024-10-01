@@ -87,7 +87,7 @@ router.post('/modules/pages', [
         let courseModule = await CourseModuleSchema.findOne({ _id: module_id })
 
         let arr = courseModule?.pages ?? []
-        let allPages = await CoursePageSchema.find({ _id: { $in: arr } })
+        let allPages = await CoursePageSchema.find({ _id: { $in: arr }, status: true })
 
         return res.status(200).json(allPages)
 
@@ -103,7 +103,7 @@ router.get('/learning-material/:course_id', async (req, res) => {
 
         let _id = req.params.course_id;
         let course = null
-        
+
         course = await Course.findOne({ _id, status: true });
         let modules = course?.modules;
 
@@ -122,7 +122,7 @@ router.get('/learning-material/:course_id', async (req, res) => {
         });
 
         // Fetch complete page details
-        let page_details = await CoursePageSchema.find({ _id: { $in: all_pages } });
+        let page_details = await CoursePageSchema.find({ _id: { $in: all_pages }, status: true });
 
         return res.status(200).json({ modules: module_details, pages: page_details });
 
