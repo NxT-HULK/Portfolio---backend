@@ -69,17 +69,20 @@ router.post('/', [
                     <p style="margin-bottom: 1em;">We are excited to have you join our community! Thank you for subscribing to our
                         newsletter where you'll receive regular updates on:</p>
 
-                    <ul style="margin-bottom: 1em; padding-left: 1.2em;">
-                        <li><strong>🚀 Completed Projects:</strong> Get insights into our latest projects and how we're pushing
+                    <ul style="margin-bottom: 1em; padding-left: 0; list-style: none;">
+                        <li style="margin-bottom: 0.5rem;"><strong>🚀 Completed Projects:</strong> Get insights into our latest
+                            projects and how we're pushing
                             boundaries in tech.</li>
-                        <li><strong>📚 Technical Courses:</strong> Learn from our tutorials and courses, including in-depth guides
+                        <li style="margin-bottom: 0.5rem;"><strong>📚 Technical Courses:</strong> Learn from our tutorials and
+                            courses, including in-depth guides
                             on React.js, SDLC, and more.</li>
-                        <li><strong>📝 Blog Posts:</strong> Stay informed with new articles covering the latest trends, best
+                        <li style="margin-bottom: 0.5rem;"><strong>📝 Blog Posts:</strong> Stay informed with new articles covering
+                            the latest trends, best
                             practices, and industry tips.</li>
                     </ul>
 
                     <p style="margin-bottom: 1em;">As a valued subscriber, you’ll be the first to know about:</p>
-                    <ul style="margin-bottom: 1em; padding-left: 1.2em;">
+                    <ul style="margin-bottom: 1em; padding-left: 0; list-style: none;">
                         <li>🌟 New Project Launches</li>
                         <li>🎓 Upcoming Courses & Tutorials</li>
                         <li>📝 Exclusive Blog Content</li>
@@ -143,7 +146,7 @@ router.post('/', [
                                                                                                 <tr>
                                                                                                     <td
                                                                                                         style="padding-right: 8px; padding-top: 10px;">
-                                                                                                        <img src="./email.svg"
+                                                                                                        <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/pgco4oo1ajc7dympzot3.svg"
                                                                                                             alt="">
                                                                                                     </td>
                                                                                                     <td
@@ -158,7 +161,7 @@ router.post('/', [
                                                                                                 <tr>
                                                                                                     <td
                                                                                                         style="padding-right: 8px; padding-top: 10px;">
-                                                                                                        <img src="./website.svg"
+                                                                                                        <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/dccypkckeopxkyv39s4a.svg"
                                                                                                             alt="" />
                                                                                                     </td>
                                                                                                     <td
@@ -188,7 +191,8 @@ router.post('/', [
                                                                                             target="_blank"
                                                                                             rel="noopener noreferrer"
                                                                                             style="display: inline-block; cursor: pointer;">
-                                                                                            <img src="./github.svg" alt="">
+                                                                                            <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/bnpfhg46g9ixodborvbs.svg"
+                                                                                                alt="">
                                                                                         </a>
                                                                                     </td>
                                                                                     <td style="padding-right: 8px;">
@@ -196,7 +200,8 @@ router.post('/', [
                                                                                             target="_blank"
                                                                                             rel="noopener noreferrer"
                                                                                             style="display: inline-block; cursor: pointer;">
-                                                                                            <img src="./linkedin.svg" alt="">
+                                                                                            <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/sswgmcjvl6kswxkdkwfr.svg"
+                                                                                                alt="">
                                                                                         </a>
                                                                                     </td>
                                                                                     <td style="padding-right: 8px;">
@@ -204,7 +209,8 @@ router.post('/', [
                                                                                             target="_blank"
                                                                                             rel="noopener noreferrer"
                                                                                             style="display: inline-block; cursor: pointer;">
-                                                                                            <img src="./insta.svg" alt="" />
+                                                                                            <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/e9ffl18onae1rhfgvsxk.svg"
+                                                                                                alt="" />
                                                                                         </a>
                                                                                     </td>
                                                                                 </tr>
