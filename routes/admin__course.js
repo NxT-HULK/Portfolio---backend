@@ -394,4 +394,22 @@ router.post('/toggle-page-status', [
 })
 
 
+// Route 11: Get all pages of selected modules
+router.post('/modules/pages', [
+    body('module_id').exists().withMessage('Please define module id!').isMongoId().withMessage('Not a valid module id!')
+], BodyValidator, async (req, res, next) => {
+    try {
+        let { module_id } = req.body
+        let courseModule = await CourseModuleSchema.findOne({ _id: module_id })
+
+        let arr = courseModule?.pages ?? []
+        let allPages = await CoursePageSchema.find({ _id: { $in: arr } })
+
+        return res.status(200).json(allPages)
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
+
 export default router
