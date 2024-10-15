@@ -20,7 +20,11 @@ const CoursePageSchema = new Schema({
     status: {
         type: Boolean,
         default: false
-    }
+    },
+    message: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'course_page_message'
+    }]
 }, { timestamps: true })
 
 const course_page = mongoose.model('course_page', CoursePageSchema)

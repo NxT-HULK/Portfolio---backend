@@ -5,6 +5,7 @@ import { body } from 'express-validator';
 import BodyValidator from '../middleware/BodyValidator.js'
 import CourseModuleSchema from '../models/course_module.js'
 import CoursePageSchema from '../models/course_page.js'
+import CoursePageMessageSchema from '../models/course_page_message.js'
 
 const router = express.Router();
 
@@ -131,5 +132,58 @@ router.get('/learning-material/:course_id', async (req, res) => {
         return res.status(500).json('Server Error, ON_GETTING_LEARNING_MATERIAL');
     }
 });
+
+
+// Route 6: Ask doubt or give feedback
+router.post('/ask', [
+    body('name').exists().withMessage("Name not found").isLength({ min: 3 }).withMessage("Name is too short"),
+    body('email').exists().withMessage("Email not found"),
+    body('repository').optional().isURL().withMessage("Not a valid repository URL"),
+    body('mess').exists().withMessage("Message not found").isLength({ min: 25 }).withMessage("Please elaborate you doubt or feedback elaborately"),
+    body('ofPage').exists().withMessage("Page id not found").isMongoId().withMessage("Not a valid mongo ID")
+], BodyValidator, async (req, res, next) => {
+    try {
+
+        const { name, email, repository, mess, ofPage } = req.body
+
+        let coursepage = await CoursePageSchema.findOne({ _id: ofPage })
+        if (!coursepage) {
+            return res.status(404).json("Page not found")
+        }
+
+        const newMessage = new CoursePageMessageSchema({ name, email, repository, mess, ofPage })
+        await newMessage.save()
+
+        await CoursePageSchema.findOneAndUpdate({ _id: ofPage }, { $push: { message: newMessage._id } })
+
+        return res.status(201).json("Your consern has been submited. We will contact you via email if you've asked any doubt. Thank you.")
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
+
+
+// Route 7: Get all doubt and of particular page
+router.get('/ask/:pageId', async (req, res, next) => {
+    try {
+
+        const { pageId } = req.params
+        if (!pageId) {
+            res.status(400).json("Page ID not found")
+        }
+
+        const data = await CoursePageMessageSchema.find({ ofPage: pageId })
+        if (!data) {
+            return res.status(404).json("No data found")
+        }
+
+        return res.status(200).json(data)
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
+
 
 export default router

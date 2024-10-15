@@ -6,9 +6,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import ConnectToDB from './middleware/ConnectToDB.js';
-import ClientRoute from './routes/client/site/route.js';
-import AdminRoute from './routes/admin/site/route.js';
-import DefaultRoute from './routes/site/route.js';
+import ClientRoute from './routes/client__root.js';
+import AdminRoute from './routes/admin__root.js';
+import DefaultRoute from './routes/default.js';
 
 dotenv.config();
 
@@ -19,23 +19,23 @@ const whitelist = [
     'http://shivamkashyap.netlify.app'
 ];
 
-// CORS Options
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin || whitelist.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
 const initializeServer = () => {
     const app = express();
-    const port = process.env.PORT || 10000;
+    const port = process.env.PORT || 5000;
+
+    // CORS Options
+    const corsOptions = {
+        origin: function (origin, callback) {
+            if (!origin || whitelist.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    };
 
     // Middleware
     app.use(cors(corsOptions));
@@ -60,7 +60,7 @@ const initializeServer = () => {
     // Routes
     app.use('/', DefaultRoute);
     app.use('/api/client/', ClientRoute);
-    // app.use('/api/admin/', AdminRoute);
+    app.use('/api/admin/', AdminRoute);
 
     // Error handling middleware
     app.use((err, req, res, next) => {

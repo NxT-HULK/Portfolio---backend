@@ -6,7 +6,7 @@ import CourseModuleSchema from '../models/course_module.js'
 import { body } from 'express-validator';
 import BodyValidator from '../middleware/BodyValidator.js'
 import { AuthorityMatch__CourseWritter } from '../middleware/AuthorityVerification.js';
-
+import CoursePageMessageSchema from '../models/course_page_message.js';
 
 const router = express.Router();
 router.use(AuthorityMatch__CourseWritter)
@@ -406,6 +406,93 @@ router.post('/modules/pages', [
         let allPages = await CoursePageSchema.find({ _id: { $in: arr } })
 
         return res.status(200).json(allPages)
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
+
+
+// Route 12: Delete a particualr message
+router.delete('/ask/:messageId', async (req, res, next) => {
+    try {
+
+        const messageId = req.params.messageId;
+        const message = await CoursePageMessageSchema.findById(messageId);
+        if (!message) {
+            return res.status(404).json("Message not found");
+        }
+
+        const page = await CoursePageSchema.findOneAndUpdate(
+            { _id: message.ofPage },
+            { $pull: { message: messageId } }
+        );
+
+        await CoursePageMessageSchema.findByIdAndDelete(messageId);
+        return res.status(200).json({ messageId: message?._id, pageId: page?._id });
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next);
+    }
+});
+
+
+// Route 13: get all message data
+router.get('/ask', async (req, res, next) => {
+    try {
+
+        const data = await CoursePageSchema.find({
+            message: { $exists: true, $ne: [] }, // Ensure message field exists and is not an empty array
+            $expr: { $gt: [{ $size: "$message" }, 0] } // Check that message array size is greater than 0
+        }).populate('message')
+
+
+        if (data?.length === 0) {
+            return res.status(404).json("No pages with messages found");
+        }
+
+        return res.status(200).json(data);
+
+    } catch (error) {
+        errorMiddleware(error, req, res, next)
+    }
+})
+
+
+// Route 14: Send reply of message
+router.post('/ask', [
+
+    body('messageId').exists().withMessage("Message ID not found").isMongoId().withMessage("Invalid message ID"),
+    body('mailFlag').exists().withMessage("Mail flag not found").isBoolean().withMessage("Invalid mail flag!"),
+    body('reply').exists().withMessage("Reply message not found").isLength({ min: 25 }).withMessage("Reply message is too short!"),
+    body('email').optional().isEmail().withMessage("Invalid email!"),
+    body('subject').optional().isLength({ min: 25 }).withMessage("Subject is too short!"),
+    body('mailData').optional().isLength({ min: 25 }).withMessage("Mail is too short!"),
+
+], BodyValidator, async (req, res, next) => {
+    try {
+
+        const { mailFlag, reply, email, subject, mailData, messageId } = req.body
+        const update = await CoursePageMessageSchema.findOneAndUpdate({ _id: messageId }, { $set: { reply: reply } })
+
+        if (mailFlag === true) {
+            await nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.MAILINGADDRESS,
+                    pass: process.env.MAILINGKEY
+                }
+            }).sendMail({
+                from: process.env.MAILINGADDRESS,
+                to: email,
+                subject: subject,
+                html: mailData
+            })
+
+            return res.status(200).json({ pageId: update?.ofPage, messageId: messageId })
+        } else {
+            return res.status(200).json({ pageId: update?.ofPage, messageId: messageId })
+        }
 
     } catch (error) {
         errorMiddleware(error, req, res, next)
