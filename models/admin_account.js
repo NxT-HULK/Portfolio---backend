@@ -9,8 +9,8 @@ const AdminSchema = new Schema({
         type: String,
         required: true,
         enum: {
-            values: ['Admin', 'CourseWritter', 'BlogWritter'],
-            message: 'Authority must be either Admin, CourseWritter, or BlogWritter'
+            values: ['Admin', 'CourseWritter', 'BlogWritte'],
+            message: 'Authority must be either Admin, CourseWritter, or BlogWriter'
         }
     },
     email: {
@@ -22,9 +22,8 @@ const AdminSchema = new Schema({
         type: String,
         required: true
     },
-    recovery: {
+    recoveryToken: {
         type: String,
-        default: ""
     },
     verified: {
         type: Boolean,

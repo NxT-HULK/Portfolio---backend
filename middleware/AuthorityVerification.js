@@ -58,9 +58,26 @@ export const AuthorityMatch__Admin = async (req, res, next) => {
             return res.status(400).json("Unauthorize access")
         }
 
-        if (data?.authority === "Admin") {
+        const user = await AdminSchema.findOne({ email: data?.email })
+        if (!user) {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            })
+
+            return res.status(400).json("User not found")
+        }
+
+        if (data?.hashPass === user?.hashPass && data?.authority === "Admin") {
             next();
         } else {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            })
+
             return res.status(400).json("You are not allowed here")
         }
 
@@ -80,9 +97,26 @@ export const AuthorityMatch__CourseWritter = async (req, res, next) => {
             return res.status(400).json("Unauthorize access")
         }
 
-        if (data?.authority === "CourseWritter" || data?.authority === "Admin") {
+        const user = await AdminSchema.findOne({ email: data?.email })
+        if (!user) {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            })
+
+            return res.status(400).json("User not found")
+        }
+
+        if ((data?.hashPass === user?.hashPass) && (data?.authority === "CourseWriter" || data?.authority === "Admin")) {
             next();
         } else {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            })
+
             return res.status(400).json("You are not allowed here")
         }
 
@@ -102,9 +136,26 @@ export const AuthorityMatch__BlogWritter = async (req, res, next) => {
             return res.status(400).json("Unauthorize access")
         }
 
-        if (data?.authority === "BlogWritter" || data?.authority === "Admin") {
+        const user = await AdminSchema.findOne({ email: data?.email })
+        if (!user) {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            })
+
+            return res.status(400).json("User not found")
+        }
+
+        if ((data?.hashPass === user?.hashPass) && (data?.authority === "BlogWriter" || data?.authority === "Admin")) {
             next();
         } else {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'None',
+            })
+
             return res.status(400).json("You are not allowed here")
         }
 

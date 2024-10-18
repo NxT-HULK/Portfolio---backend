@@ -1,4 +1,3 @@
-// TODO - Account recovery code is pending
 import express from 'express'
 import { body } from 'express-validator'
 import jwt from 'jsonwebtoken'
@@ -10,6 +9,24 @@ import nodemailer from 'nodemailer'
 import { VerifySuperAdmin } from '../middleware/AuthorityVerification.js'
 
 const router = express.Router();
+
+// Function to send emails
+const sendEmail = async (to, subject, htmlContent) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.MAILINGADDRESS,
+            pass: process.env.MAILINGKEY,
+        },
+    });
+
+    await transporter.sendMail({
+        from: process.env.MAILINGADDRESS,
+        to,
+        subject,
+        html: htmlContent,
+    });
+};
 
 
 // Route 1: Supper admin login via .env (MASTER_PASS) password
@@ -123,209 +140,63 @@ router.post('/signup', VerifySuperAdmin, [
             html: `
                 <!DOCTYPE html>
                 <html lang="en">
-
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Welcome to the Team! 🎉</title>
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <title>Welcome to the Team!</title>
                 </head>
-
-                <body
-                    style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa;">
-                    <div
-                        style="max-width: 600px; margin: 2rem auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-
-                        <h1 style="color: #6a59d1;">Dear ${name},</h1>
-
-                        <p style="color: #000;">
-                            We are excited to inform you that you have been selected for the part-time course writing job at
-                            <strong>Shivam Kashyap</strong>! 🎉
-                        </p>
-
-                        <p style="color: #000;">
-                            As part of this role, you will be responsible for creating engaging and informative course content for our
-                            platform. This is an amazing opportunity to contribute to the learning community while enhancing your own
-                            skills. 🚀
-                        </p>
-
-                        <p style="color: #000; font-size: 18px;"><strong>📝 Job Details:</strong></p>
-                        <ul style="color: #000;">
-                            <li><strong>Position:</strong> ${authority}</li>
-                            <li><strong>Location:</strong> Remote 🏡</li>
-                            <li><strong>Start Date:</strong> As soon as possible ⏳</li>
-                        </ul>
-
-                        <p style="color: #000;">
-                            We believe that your knowledge and expertise will be a great asset to our team. Please click the link below
-                            to confirm your acceptance of this offer and to begin the onboarding process. 📚✨
-                        </p>
-
-                        <p style="text-align: center;">
-                            <a href="${process.env.FRONTENDHOST}/#/account/verify?email=${email}&authority=${authority}"
-                                style="padding: 12px 24px; background-color: #6a59d1; color: #fff; text-decoration: none; border-radius: 6px; display: inline-block;">
-                                Activate Your Account 🚀
-                            </a>
-                        </p>
-
-                        <p style="color: #000;">
-                            If the above button is not working, please copy and paste the following link into your browser:
-                        </p>
-
-                        <p style="background-color: #222; padding: 10px; text-align: center;">
-                            <a href="${process.env.FRONTENDHOST}/#/account/verify?email=${email}&authority=${authority}"
-                                style="color: #fff; text-decoration: none;" target="_blank" rel="noopener noreferrer">
-                                ${process.env.FRONTENDHOST}/#/account/verify?email=${email}&authority=${authority}
-                            </a>
-                        </p>
-
-                        <p style="color: #000;">
-                            If you have any questions, feel free to reach out to us. We are looking forward to working with you and
-                            can’t wait to see the amazing contributions you will bring to the team! 💼✨
-                        </p>
-
-                        <div class="footer" style="margin-top: 1.5rem;">
-                            <table cellpadding="0" cellspacing="0"
-                                style="border: none; font-size: 100%; line-height: 1; border-collapse: collapse; font-family: 'Comic Sans MS', cursive;">
-                                <tbody>
-                                    <tr style="width: 100%;">
-                                        <td>
-                                            <table cellpadding="0" cellspacing="0"
-                                                style="border: none; font-size: 100%; line-height: 1; border-collapse: separate; background-color: rgb(237, 235, 249); padding: 16px; font-family: 'Comic Sans MS', cursive; border-radius: 4px;">
-                                                <tbody>
-                                                    <tr style="width: 100%;">
-                                                        <td style="padding-left: 0px; vertical-align: top; padding-top: 0px;">
-                                                            <table cellpadding="0" cellspacing="0"
-                                                                style="border: none; font-size: 100%; line-height: 1; border-collapse: collapse;">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td
-                                                                            style="color: rgb(106, 89, 209); font-weight: bold; font-size: 153%;">
-                                                                            <span>Shivam Kumar Kashyap</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td style="padding-top: 8px; vertical-align: top;"><span
-                                                                                style="color: rgb(34, 34, 34);">MERN Stack
-                                                                                Developer</span></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <table cellpadding="0" cellspacing="0"
-                                                                                style="border: none; font-size: 100%; line-height: 1; width: 95%; border-collapse: collapse; min-width: 95%; max-width: 95%; table-layout: fixed;">
-                                                                                <tbody>
-                                                                                    <tr>
-                                                                                        <td height="1"
-                                                                                            style="height: 1px; max-height: 1px; border-bottom: 1px solid rgb(106, 89, 209); line-height: 1px; padding-top: 12px;">
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <table cellpadding="0" cellspacing="0"
-                                                                                style="border: none; font-size: 100%; line-height: 1; border-collapse: collapse;">
-                                                                                <tbody>
-                                                                                    <tr>
-                                                                                        <td style="padding-top: 10px;">
-                                                                                            <table cellpadding="0" cellspacing="0"
-                                                                                                style="border: none; font-size: 100%; line-height: 1; border-collapse: collapse;">
-                                                                                                <tbody>
-                                                                                                    <tr>
-                                                                                                        <td
-                                                                                                            style="padding-right: 8px; padding-top: 10px;">
-                                                                                                            <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/pgco4oo1ajc7dympzot3.svg"
-                                                                                                                alt="">
-                                                                                                        </td>
-                                                                                                        <td
-                                                                                                            style="vertical-align: middle; padding-right: 0px; padding-top: 10px;">
-                                                                                                            <span
-                                                                                                                style="color: rgb(34, 34, 34);">
-                                                                                                                <a style="text-decoration: none; color: inherit;"
-                                                                                                                    href="mailto:shivamkumarkashyap12@gmail.com">shivamkumarkashyap12@gmail.com</a>
-                                                                                                            </span>
-                                                                                                        </td>
-                                                                                                    </tr>
-                                                                                                    <tr>
-                                                                                                        <td
-                                                                                                            style="padding-right: 8px; padding-top: 10px;">
-                                                                                                            <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/dccypkckeopxkyv39s4a.svg"
-                                                                                                                alt="" />
-                                                                                                        </td>
-                                                                                                        <td
-                                                                                                            style="vertical-align: middle; padding-right: 0px; padding-top: 10px;">
-                                                                                                            <a href="https://shivamkashyap.netlify.app/"
-                                                                                                                target="_blank"
-                                                                                                                rel="noopener noreferrer"
-                                                                                                                style="color: rgb(34, 34, 34); cursor: pointer; text-decoration: none;">https://shivamkashyap.netlify.app/</a>
-                                                                                                        </td>
-                                                                                                    </tr>
-                                                                                                </tbody>
-                                                                                            </table>
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr style="width: 100%;">
-                                                                        <td style="padding-top: 18px;">
-                                                                            <table cellpadding="0" cellspacing="0"
-                                                                                style="border: none; font-size: 100%; line-height: 1; width: auto; border-collapse: collapse;">
-                                                                                <tbody>
-                                                                                    <tr>
-                                                                                        <td style="padding-right: 8px;">
-                                                                                            <a href="https://github.com/mernwala"
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                style="display: inline-block; cursor: pointer;">
-                                                                                                <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/bnpfhg46g9ixodborvbs.svg"
-                                                                                                    alt="">
-                                                                                            </a>
-                                                                                        </td>
-                                                                                        <td style="padding-right: 8px;">
-                                                                                            <a href="https://www.linkedin.com/in/shivam-kumar-kashyap-382794249"
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                style="display: inline-block; cursor: pointer;">
-                                                                                                <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/sswgmcjvl6kswxkdkwfr.svg"
-                                                                                                    alt="">
-                                                                                            </a>
-                                                                                        </td>
-                                                                                        <td style="padding-right: 8px;">
-                                                                                            <a href="https://www.instagram.com/nxt_hulk/"
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                style="display: inline-block; cursor: pointer;">
-                                                                                                <img src="https://res.cloudinary.com/dusoydzkq/image/upload/v1727889001/e9ffl18onae1rhfgvsxk.svg"
-                                                                                                    alt="" />
-                                                                                            </a>
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+                    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                        <div style="text-align: center; background-color: #6a59d1; padding: 20px; border-radius: 8px 8px 0 0; color: #ffffff;">
+                            <h1 style="margin: 0; font-size: 24px;">🎉 Welcome to the Team!</h1>
                         </div>
-
-                        <div style="margin-top: 1rem;">
-                            <span style="display: block; color: #aaa; font-size: 14px;">This is an exciting update regarding your job
-                                application. We can't wait for you to join us!</span>
+                        <div style="padding: 20px; color: #333;">
+                            <p style="line-height: 1.6; margin-bottom: 15px;">Dear ${name},</p>
+                            <p style="line-height: 1.6; margin-bottom: 15px;">
+                                We are excited to inform you that you have been selected
+                                for the part-time job at <strong>Shivam Kashyap</strong>! 🎉 As part of this role, you will be
+                                responsible for creating engaging and informative content for our platform. This is an amazing
+                                opportunity to contribute to the learning community while enhancing your own skills. 🚀
+                            </p>
+                            <p style="line-height: 1.6; margin-bottom: 15px;"><strong>📝 Job Details:</strong></p>
+                            <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 15px;">
+                                <li><strong>Position:</strong> ${authority}</li>
+                                <li><strong>Location:</strong> Remote 🏡</li>
+                                <li><strong>Start Date:</strong> As soon as possible ⏳</li>
+                            </ul>
+                            <p style="line-height: 1.6; margin-bottom: 15px;">
+                                We believe that your knowledge and expertise will be a
+                                great asset to our team. Please click the link below to confirm your acceptance of this offer and to
+                                begin the onboarding process. 📚✨
+                            </p>
+                            <p style="text-align: center; margin: 20px 0;">
+                                <a href="${process.env.FRONTENDHOST}/#/account/verify?email=${email}&authority=${authority}"
+                                    style="padding: 12px 24px; background-color: #6a59d1; color: #fff; text-decoration: none; border-radius: 6px; display: inline-block;">
+                                    Activate Your Account 🚀
+                                </a>
+                            </p>
+                            <p style="line-height: 1.6; margin-bottom: 15px;">
+                                If the above button is not working, please copy and paste the following link into your browser:
+                            </p>
+                            <p style="background-color: #222; padding: 10px; text-align: center; color: #fff; margin: 20px 0;">
+                                <a href="${process.env.FRONTENDHOST}/#/account/verify?email=${email}&authority=${authority}"
+                                    style="color: #fff; text-decoration: none;" target="_blank" rel="noopener noreferrer">
+                                    ${process.env.FRONTENDHOST}/#/account/verify?email=${email}&authority=${authority}
+                                </a>
+                            </p>
+                            <p style="line-height: 1.6; margin-bottom: 15px;">If you have any questions, feel free to reach out to us. We are looking forward to working with you and can’t wait to see the amazing contributions you will bring to the team! 💼✨</p>
+                            <div style="color: #aaa; font-size: 14px; margin-top: 20px;">
+                                <span style="display: block;">This is an exciting update regarding your job application. We can't wait for you to join us!</span>
+                            </div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background-color: #6a59d1; color: #ffffff; border-radius: 0 0 8px 8px;">
+                            <p style="margin: 5px 0;">
+                                If you need further assistance, feel free to contact our <a style="color: #fff;" href="${process.env.FRONTENDHOST}/#/contact" target="_blank" rel="noopener noreferrer">support team</a>
+                            </p>
                         </div>
                     </div>
                 </body>
-
                 </html>
             `
         })
@@ -360,7 +231,8 @@ router.post('/verify', [
         const user = await AdminSchema.findOne({ email })
         const data = {
             email: user?.email,
-            authority: user?.authority
+            authority: user?.authority,
+            hashPass: user?.hashPass
         }
 
         const token = await jwt.sign(data, process.env.JWTSECRET)
@@ -401,7 +273,8 @@ router.post('/login', [
 
             const data = {
                 email: user?.email,
-                authority: user?.authority
+                authority: user?.authority,
+                hashPass: user?.hashPass
             }
 
             const token = await jwt.sign(data, process.env.JWTSECRET)
@@ -467,31 +340,134 @@ router.post('/logout', (req, res) => {
 });
 
 
-// Route 6: Sending forgot password link to mail id
-router.post('/recovery', [
-    body('email').exists().withMessage("Email not found").isEmail().withMessage("Email not valid")
+// Route 6: Sending recovery token to email
+router.post('/request-recover-link', [
+    body('email').exists().withMessage('Email not found').isEmail().withMessage('Not a valid email ID'),
 ], BodyValidator, async (req, res, next) => {
     try {
-        // write logic for sending mail and password change link with a token [ http://localhost:3000/change-password?token=<token_goes_here> ]
+        const { email } = req.body;
+        const user = await AdminSchema.findOne({ email });
+
+        if (!user) {
+            return res.status(200).json('If an account with this email exists, a recovery email will be sent.');
+        }
+
+        const token = jwt.sign({ email }, process.env.JWTSECRET, { expiresIn: '15m' });
+        const hashedToken = await bcrypt.hash(token, 10);
+
+        await AdminSchema.findOneAndUpdate({ email }, { $set: { recoveryToken: hashedToken } });
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <title>Admin Account Recovery</title>
+            </head>
+
+            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+                <div
+                    style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+                    <div
+                        style="text-align: center; background-color: #3f2e9f; padding: 20px; border-radius: 8px 8px 0 0; color: #ffffff;">
+                        <h1 style="margin: 0; font-size: 24px;">🔐 Admin Account Recovery</h1>
+                    </div>
+                    <div style="padding: 20px; color: #333;">
+                        <p>Hello ${user.name},</p>
+                        <p>We have received a request to recover your admin account. Please use the recovery link provided below to
+                            proceed. The link is valid for the next <strong>15 minutes</strong>.</p>
+
+                            <p style="text-align: center; margin: 20px 0;">
+                                <a href="${process.env.FRONTENDHOST}/#/auth/reset?token=${token}&email=${email}"
+                                    style="padding: 12px 24px; background-color: #6a59d1; color: #fff; text-decoration: none; border-radius: 6px; display: inline-block;">
+                                    Reset Password
+                                </a>
+                            </p>
+                
+                            <p style="line-height: 1.6; margin-bottom: 15px;">If the above button is not working, please copy and
+                                paste the following link into your browser:</p>
+                
+                            <p style="background-color: #222; padding: 10px; text-align: center; color: #fff; margin: 20px 0;">
+                                <a href="${process.env.FRONTENDHOST}/#/auth/reset?token=${token}&email=${email}"
+                                    style="color: #fff; text-decoration: none;" target="_blank" rel="noopener noreferrer">
+                                    ${process.env.FRONTENDHOST}/#/auth/reset?token=${token}&email=${email}
+                                </a>
+                            </p>
+
+                        <p>If you did not request this, please ignore this email. Your account will remain secure.</p>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 20px; background-color: #3f2e9f; color: #ffffff; border-radius: 0 0 8px 8px;">
+                        <p>If you've not requested any password change contact our <a href="${process.env.FRONTENDHOST}/#/contact" target="_blank" rel="noopener noreferrer" style="color: #ffffff; text-decoration: underline;">support team</a></p>
+                    </div>
+                </div>
+            </body>
+
+            </html>
+        `;
+
+        await sendEmail(email, 'Account Recovery', htmlContent);
+        return res.status(200).json('Recovery link sent successfully to email');
     } catch (error) {
-        errorMiddleware(error, req, res, next)
+        errorMiddleware(error, req, res, next);
     }
-})
+});
 
 
-// Route 7: Password change
-router.put('/change-password', [
-    body('email').exists().withMessage("Email not found").isEmail().withMessage("Email not valid"),
-    body('password').exists().withMessage("Password not found").isLength({ min: 6 }).withMessage("Password validation failed")
+// Route 7: Change Password
+router.post('/reset-password', [
+    body('email').exists().isEmail().withMessage('Invalid email'),
+    body('token').exists().withMessage('Token not found'),
+    body('password').exists().isLength({ min: 6 }).withMessage('Password is too short'),
 ], BodyValidator, async (req, res, next) => {
-
     try {
-        // logic to change password
-    } catch (error) {
-        errorMiddleware(error, req, res, next)
-    }
+        const { email, token, password } = req.body;
+        const user = await AdminSchema.findOne({ email });
 
-})
+        if (!user) {
+            return res.status(400).json('User not found');
+        }
+
+        // Compare the provided token with the hashed token in the database
+        const isValidToken = await bcrypt.compare(token, user.recoveryToken);
+        if (!isValidToken) {
+            return res.status(400).json('Unauthorized access, invalid token.');
+        }
+
+        // Verify if the token has expired
+        try {
+            jwt.verify(token, process.env.JWTSECRET);
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                return res.status(401).json('Token has expired. Please request a new password reset.');
+            }
+            return res.status(400).json('Invalid token.');
+        }
+
+        // Check if the new password is the same as the old one
+        const isSamePassword = await bcrypt.compare(password, user.hashPass);
+        if (isSamePassword) {
+            return res.status(400).json('New password cannot be the same as the old password.');
+        }
+
+        // Hash and update the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await AdminSchema.findOneAndUpdate({ email }, { $set: { recoveryToken: "", hashPass: hashedPassword } });
+
+        res.clearCookie('authToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+        })
+
+        return res.status(200).json('Password updated successfully');
+    } catch (error) {
+        errorMiddleware(error, req, res, next);
+    }
+});
 
 
 export default router
