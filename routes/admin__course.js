@@ -42,13 +42,7 @@ router.get('/', async (req, res, next) => {
 // Route 2: Create new course || Update old course data (basic Data)
 router.post('/', [
     body('name').exists().withMessage('Please define course name').isLength({ min: 25 }).withMessage('Course name is too short'),
-    body('img').exists().withMessage('Please input background img url').isURL().withMessage('Not a valid link').custom((value) => {
-        let prefixCommon = "https://onedrive.live.com/embed?resid"
-        if (prefixCommon !== value.substring(0, 37)) {
-            throw new Error('You should provide onedrive embed link')
-        }
-        return true;
-    }),
+    body('img').exists().withMessage('Please input background img url').isURL().withMessage('Not a valid link'),
     body('usedTech').exists().withMessage('Please input \"Tech Stack\" atleast 3 ').isArray({ min: 3 }).withMessage('Please provide atleast 3 \"Tech Stack\"'),
     body('information').exists().withMessage('Please define course description with html raw data').isLength({ min: 50 }).withMessage('Course description is too short!'),
     body('welcome_screen').exists().withMessage('Please define welcome screen html raw data').isLength({ min: 30 }).withMessage('Welcome Screen data html is too short')
